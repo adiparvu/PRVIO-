@@ -27,11 +27,17 @@ struct PantryView: View {
 
     private var low: [PantryItem] { filtered.filter(\.isLow) }
 
-    private var byCategory: [(category: (id: String, label: String, icon: String), items: [PantryItem])] {
-        PantryCategory.all.compactMap { cat in
+    private typealias CategoryGroup = (category: (id: String, label: String, icon: String), items: [PantryItem])
+
+    // Explicit loop: the Swift 6.4 type checker crashes ("failed to produce
+    // diagnostic") inferring a labeled nested tuple out of compactMap.
+    private var byCategory: [CategoryGroup] {
+        var groups: [CategoryGroup] = []
+        for cat in PantryCategory.all {
             let hits = filtered.filter { $0.category == cat.id && !$0.isLow }
-            return hits.isEmpty ? nil : (cat, hits)
+            if !hits.isEmpty { groups.append((category: cat, items: hits)) }
         }
+        return groups
     }
 
     var body: some View {
