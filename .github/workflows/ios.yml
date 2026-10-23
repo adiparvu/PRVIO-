@@ -173,6 +173,19 @@ jobs:
       - name: Generate project
         run: xcodegen generate
 
+      # The test run builds for iOS only; this proves the watch app and its
+      # complications extension compile too (watchOS simulator SDK).
+      - name: Build the watch app
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project PRVIO.xcodeproj \
+            -target PRVIOWatch \
+            -sdk watchsimulator \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            2>&1 | awk '/error:|\*\* BUILD/'
+
       - name: Run unit tests on a simulator
         run: |
           DEVICE=$(xcrun simctl list devices available | grep -E "iPhone" | head -1 | sed -E 's/^ *(.+) \([0-9A-Fa-f-]+\) \(.*/\1/' | xargs)
