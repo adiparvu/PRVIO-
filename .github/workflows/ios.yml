@@ -54,6 +54,17 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_27.1.app || sudo xcode-select -s /Applications/Xcode_27.app
           xcodebuild -version
 
+      # Xcode 27 ships the Metal compiler as a separate download and some
+      # image revisions omit it — the app's .metal shaders then fail with
+      # "cannot execute tool 'metal' due to missing Metal Toolchain".
+      - name: Install Metal Toolchain
+        run: |
+          for i in 1 2 3; do
+            sudo xcodebuild -downloadComponent MetalToolchain && break
+            echo "MetalToolchain download attempt $i failed, retrying..."
+            sleep 10
+          done
+
       - name: Install iOS platform
         run: |
           xcodebuild -version
@@ -131,6 +142,17 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode_27.1.app || sudo xcode-select -s /Applications/Xcode_27.app
           xcodebuild -version
+
+      # Xcode 27 ships the Metal compiler as a separate download and some
+      # image revisions omit it — the app's .metal shaders then fail with
+      # "cannot execute tool 'metal' due to missing Metal Toolchain".
+      - name: Install Metal Toolchain
+        run: |
+          for i in 1 2 3; do
+            sudo xcodebuild -downloadComponent MetalToolchain && break
+            echo "MetalToolchain download attempt $i failed, retrying..."
+            sleep 10
+          done
 
       - name: Install iOS platform
         run: |
