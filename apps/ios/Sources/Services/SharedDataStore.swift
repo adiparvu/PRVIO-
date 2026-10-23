@@ -1124,8 +1124,10 @@ enum SharedDataStore {
                                   "startedAt": String(startedAt.timeIntervalSince1970)])
     }
 
-    static func writePendingSessionEnd() {
-        writePendingSessionEvent(["end": "1"])
+    /// `completingTask: false` is the wrist's "End" — the time is banked
+    /// but the task stays open; "Complete" finishes both.
+    static func writePendingSessionEnd(completingTask: Bool = true) {
+        writePendingSessionEvent(["end": "1", "complete": completingTask ? "1" : "0"])
     }
 
     /// The session slot rides the coordinated queue as a single JSON-encoded
@@ -1142,7 +1144,7 @@ enum SharedDataStore {
     }
 
     /// nil = nothing pending; (nil) start = the session should END.
-    static func consumePendingSessionEvent() -> (start: (taskId: UUID, title: String, startedAt: Date)?, isEnd: Bool)? {
+    static func consumePendingSessionEvent() -> (start: (taskId: UUID, title: String, startedAt: Date)?, isEnd: Bool, completesTask: Bool)? {
         var event: [String: String]?
         coordinateQueue("session", legacyKey: nil) { queue in
             if let json = queue.first, let data = json.data(using: .utf8) {
@@ -1157,11 +1159,12 @@ enum SharedDataStore {
             event = legacy
         }
         guard let dict = event else { return nil }
-        if dict["end"] == "1" { return (start: nil, isEnd: true) }
+        // Events written before `complete` existed always completed the task.
+        if dict["end"] == "1" { return (start: nil, isEnd: true, completesTask: dict["complete"] != "0") }
         guard let idStr = dict["id"], let id = UUID(uuidString: idStr),
               let title = dict["title"],
               let ts = dict["startedAt"].flatMap(Double.init) else { return nil }
-        return (start: (taskId: id, title: title, startedAt: Date(timeIntervalSince1970: ts)), isEnd: false)
+        return (start: (taskId: id, title: title, startedAt: Date(timeIntervalSince1970: ts)), isEnd: false, completesTask: false)
     }
 
     static func appendPendingSupplyCheck(_ itemId: UUID) {

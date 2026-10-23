@@ -223,8 +223,10 @@ enum PendingActionDrain {
                 WorkSessionStore.shared.start(
                     taskId: start.taskId, title: start.title, startedAt: start.startedAt)
             } else if event.isEnd {
-                // Finish from the wrist banks the time and completes the task.
-                if let done = WorkSessionStore.shared.finish(),
+                // The wrist's "Complete" banks the time and completes the task;
+                // its "End" banks the time and leaves the task open.
+                if let done = WorkSessionStore.shared.finish(completingTask: event.completesTask),
+                   event.completesTask,
                    let task = ctx.taskService.tasks.first(where: { $0.id == done.taskId }),
                    !task.isCompleted {
                     Task { await ctx.taskService.toggleComplete(task) }

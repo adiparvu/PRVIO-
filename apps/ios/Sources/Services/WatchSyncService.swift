@@ -195,7 +195,8 @@ final class WatchSyncService: NSObject, WCSessionDelegate {
         }
         if action == "sessionEnd" {
             DispatchQueue.main.async {
-                SharedDataStore.writePendingSessionEnd()
+                SharedDataStore.writePendingSessionEnd(
+                    completingTask: (userInfo["complete"] as? String) != "0")
                 NotificationCenter.default.post(name: .prvioProcessPending, object: nil)
             }
             return

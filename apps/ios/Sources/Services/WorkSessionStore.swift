@@ -82,15 +82,17 @@ final class WorkSessionStore {
     /// clears the live state. Returns the finished (taskId, seconds) so the
     /// caller can mark the task done — the confirmed "Finish = stop + complete"
     /// behaviour — or nil if nothing was running.
+    /// `completingTask: false` banks the time but tells the Live Activity the
+    /// work stopped rather than finished (the wrist's "End").
     @discardableResult
-    func finish() -> (taskId: UUID, seconds: TimeInterval)? {
+    func finish(completingTask: Bool = true) -> (taskId: UUID, seconds: TimeInterval)? {
         guard let s = active else { return nil }
         let total = s.elapsed(at: Date())
         addWorked(taskId: s.taskId, seconds: total)
         active = nil
         persist()
-        HapticFeedback.success()
-        LiveActivityService.shared.endWorkSession(completed: true)
+        if completingTask { HapticFeedback.success() }
+        LiveActivityService.shared.endWorkSession(completed: completingTask)
         return (s.taskId, total)
     }
 
