@@ -30,6 +30,9 @@ struct TasksView: View {
     /// as the id so the pushed page always reads the live task from the
     /// service instead of a snapshot.
     @State private var detailTaskId: UUID?
+    /// The deep-linked task already given one fresh fetch — a deleted or
+    /// unreadable task must not loop reloads.
+    @State private var deepLinkFetchedFor: UUID?
 
     enum TaskFilter: String, CaseIterable {
         case all = "All"
@@ -568,8 +571,16 @@ struct TasksView: View {
     /// `.id(task.id)`, so both are valid targets), then pushes its detail
     /// page — same destination a tap lands on.
     private func resolveTaskDeepLink(_ proxy: ScrollViewProxy) {
-        guard let id = router.deepLinkTaskId,
-              taskService.tasks.contains(where: { $0.id == id }) else { return }
+        guard let id = router.deepLinkTaskId else { return }
+        guard taskService.tasks.contains(where: { $0.id == id }) else {
+            // A task someone else just assigned (the "new task for you" push)
+            // isn't in the list yet — fetch once; the count change re-runs
+            // this resolver through `.task(id: tasks.count)`.
+            guard deepLinkFetchedFor != id else { return }
+            deepLinkFetchedFor = id
+            Task { await taskService.load() }
+            return
+        }
         router.deepLinkTaskId = nil
         withAnimation(reduceMotion ? nil : .taskSpring) {
             proxy.scrollTo(id, anchor: .center)

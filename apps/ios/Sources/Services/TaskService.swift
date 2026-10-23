@@ -110,6 +110,8 @@ final class TaskService {
         realtimeReload = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .milliseconds(400))
             // Quiet in the background (0x8BADF00D scene-update watchdog, b1036).
+            // The skipped change is NOT lost: MainTabView reloads tasks on
+            // every return to the foreground.
             guard !Task.isCancelled, !AppLifecycle.isBackgrounded else { return }
             await self?.load()
         }

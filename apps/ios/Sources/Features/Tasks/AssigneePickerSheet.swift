@@ -146,7 +146,7 @@ struct AssigneePickerSheet: View {
 
     /// The most common assignment deserves a single tap: yourself, first.
     private func assignMeRow(_ me: PickPerson) -> some View {
-        let selected = assigneeIds.contains(me.pickId)
+        let selected = assigneeIds.contains(where: me.matches)
         return Button {
             toggle(me)
         } label: {
@@ -180,7 +180,7 @@ struct AssigneePickerSheet: View {
     }
 
     private func personRow(_ p: PickPerson) -> some View {
-        let selected = assigneeIds.contains(p.pickId)
+        let selected = assigneeIds.contains(where: p.matches)
         return Button {
             toggle(p)
         } label: {
@@ -284,9 +284,13 @@ struct AssigneePickerSheet: View {
     private func toggle(_ p: PickPerson) {
         HapticFeedback.selection()
         withAnimation(.snappy) {
-            if let idx = assigneeIds.firstIndex(of: p.pickId) {
-                assigneeIds.remove(at: idx)
-                if idx < assigneeNames.count { assigneeNames.remove(at: idx) }
+            if assigneeIds.contains(where: p.matches) {
+                // Drop every alias (a legacy roster id and the account id
+                // may both be present), keeping names index-aligned.
+                for idx in assigneeIds.indices.reversed() where p.matches(assigneeIds[idx]) {
+                    assigneeIds.remove(at: idx)
+                    if idx < assigneeNames.count { assigneeNames.remove(at: idx) }
+                }
             } else {
                 assigneeIds.append(p.pickId)
                 assigneeNames.append(p.displayName)
@@ -390,7 +394,7 @@ struct AssigneePickerSheet: View {
     /// entries and everyone unresolved fall back to initials.
     @ViewBuilder
     private func avatarFor(id: String, name: String, size: CGFloat) -> some View {
-        if let p = people.first(where: { $0.pickId == id }) {
+        if let p = people.first(where: { $0.matches(id) }) {
             avatarContent(p, size: size)
         } else if let url = AssigneeAvatarView.directoryAvatarURL(assigneeId: id, name: name) {
             StorageImage(url: url) { phase in
@@ -435,12 +439,29 @@ private struct PickPerson: Identifiable {
     /// there's no account to fall back to. An unlinked roster row shadowing
     /// a real account would silence the assignment push, so the account
     /// fallback (migration 149) wins there.
+    ///
+    /// Whenever an ACCOUNT exists, its `user_<uid>` form wins — it is the only
+    /// encoding the read policy (`is_task_assignee`, migration 151) matches
+    /// unconditionally. A roster id only grants read access when that row is
+    /// linked to the user AND sits on this exact property; a roster row that
+    /// was unlinked, NULL-property or from another home made the tag a dead
+    /// letter — the person got the push yet never saw the task.
     var pickId: String {
-        if let member, member.userId != nil || account == nil {
-            return member.id.uuidString
-        }
-        return "user_" + (account?.userId.uuidString ?? "")
+        if let account { return "user_" + account.userId.uuidString }
+        return member?.id.uuidString ?? ""
     }
+
+    /// Every encoding this person may already be stored under — tasks tagged
+    /// before the rule above still show them as selected, and un-tagging
+    /// removes every alias. Case-insensitive (Swift writes uppercase uuids).
+    var aliasIds: Set<String> {
+        var ids: Set<String> = [pickId.lowercased()]
+        if let member { ids.insert(member.id.uuidString.lowercased()) }
+        if let account { ids.insert("user_" + account.userId.uuidString.lowercased()) }
+        return ids
+    }
+
+    func matches(_ id: String) -> Bool { aliasIds.contains(id.lowercased()) }
 
     var displayName: String {
         if let p = profile, !p.bestName.isEmpty { return p.bestName }

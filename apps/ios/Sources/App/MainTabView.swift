@@ -248,6 +248,12 @@ struct MainTabView: View {
                 // A reminder ticked in the Reminders app while we were in the
                 // background completes its linked task on return.
                 Task { await taskService.syncFromReminders() }
+                // Tasks other members created or assigned while we were away:
+                // realtime events that land in the background are dropped and
+                // a dead channel never replays, so the list re-pulls on
+                // return (load() also re-subscribes a dead channel). Never
+                // before the world loaded — that path does its own first load.
+                if worldLoaded { Task { await taskService.load() } }
                 // Any household member who changed their photo while we were
                 // away shows their new avatar the moment we return.
                 MemberDirectory.shared.refreshSoon()
