@@ -231,7 +231,7 @@ struct InventoryView: View {
                     prompt: Text("Search…"))
         .toolbar {
             if !service.items.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     filterButton
                 }
             }

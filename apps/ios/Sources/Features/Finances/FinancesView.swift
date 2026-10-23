@@ -309,7 +309,7 @@ struct FinancesView: View {
         .searchable(text: $searchText,
                     prompt: Text("fin_search_prompt"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { filterMenu }
+            ToolbarItem(placement: .pageMenu) { filterMenu }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showAddSheet = true; HapticFeedback.impact(.medium) } label: {
                     Image(systemName: "plus")

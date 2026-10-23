@@ -61,7 +61,7 @@ struct PhotoJournalView: View {
                     prompt: Text("Search…"))
         .toolbar {
             if !topTags.isEmpty || !contributors.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     filterButton
                 }
             }

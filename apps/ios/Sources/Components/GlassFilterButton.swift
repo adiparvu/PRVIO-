@@ -127,6 +127,26 @@ extension EnvironmentValues {
     }
 }
 
+// MARK: - Toolbar placement — the one circle stays at the trailing edge
+//
+// Every page's ONE menu trigger uses `.pageMenu`. On iOS 27+ that is the
+// system's `topBarPinnedTrailing`: the item is anchored to the trailing
+// edge however the toolbar reflows, and (per the SwiftUI docs) pinned
+// items only move into the overflow menu when search is active and there
+// isn't enough room. Secondary trailing items (an "+" beside the menu)
+// keep plain `.topBarTrailing`, so they are the ones that yield first.
+// Below iOS 27 the floor is the classic trailing placement.
+
+extension ToolbarItemPlacement {
+    static var pageMenu: ToolbarItemPlacement {
+        if #available(iOS 27.0, *) {
+            return .topBarPinnedTrailing
+        } else {
+            return .topBarTrailing
+        }
+    }
+}
+
 // MARK: - GlassFilterButton — one circle, every filter (IMG_8540)
 //
 // The page-level consolidation stands: ONE circular Liquid Glass trigger

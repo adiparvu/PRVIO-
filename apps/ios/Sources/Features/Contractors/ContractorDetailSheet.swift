@@ -64,7 +64,7 @@ struct ContractorDetailSheet: View {
                     Button("Close") { dismiss() }
                         .foregroundStyle(Color.primary.opacity(0.6))
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     Menu {
                         Button { showEdit = true } label: {
                             Label("Edit", systemImage: "pencil")

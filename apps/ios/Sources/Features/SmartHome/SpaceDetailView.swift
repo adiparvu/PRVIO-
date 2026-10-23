@@ -215,7 +215,7 @@ struct SpaceDetailView: View {
                     .accessibilityLabel(Text("sh_close"))
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 spaceMenu
             }
         }

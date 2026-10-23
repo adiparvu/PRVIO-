@@ -296,7 +296,7 @@ struct ContactDetailsView: View {
     // menu keeps only what has no home on the page.
     @ToolbarContentBuilder
     private var infoToolbar: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarTrailing) {
+        ToolbarItem(placement: .pageMenu) {
             Menu {
                 Button { showEditContact = true } label: {
                     Label("Editează contactul", systemImage: "person.crop.circle")
@@ -442,7 +442,7 @@ struct GroupDetailsView: View {
             // The invite QR lives in the members section now — one home, no
             // toolbar duplicate.
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     Menu {
                         Button { showEditDetails = true } label: {
                             Label("Editează numele și imaginea", systemImage: "pencil")

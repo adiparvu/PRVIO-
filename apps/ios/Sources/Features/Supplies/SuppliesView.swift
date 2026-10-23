@@ -87,7 +87,7 @@ struct SuppliesView: View {
         .searchable(text: $searchText,
                     prompt: Text("Search…"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 filterButton
             }
             if activeTab == .lists {

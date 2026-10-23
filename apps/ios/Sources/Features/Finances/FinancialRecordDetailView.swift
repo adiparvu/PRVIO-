@@ -57,7 +57,7 @@ struct FinancialRecordDetailView: View {
         .toolbar {
             // One circle, everything in it (menu law): edit, then the
             // destructive delete at the end, with its REAL role.
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 Menu {
                     Button {
                         showEdit = true

@@ -121,7 +121,7 @@ struct PRVIOTimelineView: View {
             // The one aggregated filter — replaces the chip row that
             // sat above the list. `inToolbar` because iOS 26 wraps
             // toolbar controls in system glass (IMG_8315 class).
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 GlassFilterButton(isActive: filter != .today, inToolbar: true) {
                     GlassFilterSection(options: timeFilterOptions, selection: $filter)
                 }

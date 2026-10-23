@@ -46,7 +46,7 @@ struct SupplyListDetailView: View {
                     prompt: Text("Search items…"))
         .toolbar {
             if !listItems.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     filterButton
                 }
             }

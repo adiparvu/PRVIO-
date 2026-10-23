@@ -159,7 +159,7 @@ struct ClaimDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if canWrite, let claim {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     Menu {
                         Menu {
                             ForEach(ClaimStatus.allCases) { status in

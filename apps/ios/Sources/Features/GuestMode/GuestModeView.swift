@@ -101,7 +101,7 @@ struct GuestModeView: View {
         .navigationBarTitleDisplayMode(.large)
         .onChange(of: wifiPass) { _, newVal in GuestWiFiKeychain.save(newVal) }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 moreButton
             }
         }

@@ -74,7 +74,7 @@ struct FloorPlansView: View {
                 }
             }
             if !(service.rooms.isEmpty && service.floors.isEmpty) {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     filterButton
                 }
             }

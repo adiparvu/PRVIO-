@@ -377,7 +377,7 @@ struct ContractorsView: View {
         .floatingSpeedDial(.contractors)
         .toolbar {
             if !service.contractors.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     filterButton
                 }
             }

@@ -63,7 +63,7 @@ struct LiveActivitiesHubView: View {
         .navigationBarTitleDisplayMode(.large)
         .searchable(text: $searchText, prompt: Text("la_hub_search_prompt"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 filterButton
             }
         }

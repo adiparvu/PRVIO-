@@ -186,7 +186,7 @@ struct TasksView: View {
                 }
                 .accessibilityLabel("task_new")
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 GlassFilterButton(isActive: filter != .all || historyPeriod != .month,
                                   inToolbar: true) {
                     GlassFilterSection(

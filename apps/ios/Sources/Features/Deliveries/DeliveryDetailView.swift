@@ -52,7 +52,7 @@ struct DeliveryDetailView: View {
         .toolbar {
             // One-circle law: every action for this parcel lives in the single
             // system Menu — edit, copy, complete, and delete at the end.
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 Menu {
                     Button { onEdit() } label: {
                         Label("Edit", systemImage: "pencil")

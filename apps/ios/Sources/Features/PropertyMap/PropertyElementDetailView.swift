@@ -96,7 +96,7 @@ struct PropertyElementDetailView: View {
                     }
                     .accessibilityLabel("Close")
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     Menu {
                         Button { showEditElement = true } label: {
                             Label("Edit", systemImage: "pencil")

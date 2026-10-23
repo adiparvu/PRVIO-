@@ -331,7 +331,7 @@ struct CalendarView: View {
             .accessibilityLabel(Text("cal_new_event"))
             .disabled(propertyService.primary == nil)
         }
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .pageMenu) {
             // ONE menu for the whole page (IMG_8564): the mode capsule, the
             // category filter circle and the old "…" options all live here.
             GlassFilterButton(isActive: active.count < AgendaCategory.allCases.count,

@@ -92,7 +92,7 @@ struct NotificationCenterView: View {
                     prompt: Text("Search…"))
         .toolbar {
             if !service.notifications.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     // ONE circle for the whole page (one-circle law): the
                     // module filter the old chip row offered, plus what used
                     // to be the separate checkmark button and "…" menu —

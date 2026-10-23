@@ -163,7 +163,7 @@ struct SavingsGoalDetailView: View {
         .navigationTitle(Text(verbatim: live.title))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 Menu {
                     Button { showEdit = true } label: {
                         Label("goal_edit", systemImage: "pencil")

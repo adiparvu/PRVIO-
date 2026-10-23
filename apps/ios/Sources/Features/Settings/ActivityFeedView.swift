@@ -490,7 +490,7 @@ struct ActivityFeedView: View {
         .navigationTitle("Activity")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 filterButton
             }
         }

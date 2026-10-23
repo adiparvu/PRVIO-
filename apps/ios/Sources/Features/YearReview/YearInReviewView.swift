@@ -121,7 +121,7 @@ struct YearInReviewView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { optionsButton }
+            ToolbarItem(placement: .pageMenu) { optionsButton }
         }
         .animation(reduceMotion ? nil : .smooth(duration: 0.3), value: selectedYear)
         .fullScreenCover(isPresented: $showWrapped) {

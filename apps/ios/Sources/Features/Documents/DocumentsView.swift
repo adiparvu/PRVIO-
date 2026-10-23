@@ -151,7 +151,7 @@ struct DocumentsView: View {
         .floatingSpeedDial(.documents)
         .toolbar {
             // Category filter + sort in one circle (IMG_8544).
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 filterButton(favs: favs, expiringCount: expiringCount)
             }
             if DocumentScannerView.isSupported {

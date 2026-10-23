@@ -78,7 +78,7 @@ struct SpacesTabView: View {
         .navigationTitle("spaces_title")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 quickMenu
             }
         }

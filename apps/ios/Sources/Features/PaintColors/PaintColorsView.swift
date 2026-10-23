@@ -68,7 +68,7 @@ struct PaintColorsView: View {
             // filter that used to sit as a permanent capsule plus
             // share/print, in a single aggregated popover.
             if !paintColorService.colors.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     filterButton
                 }
             }

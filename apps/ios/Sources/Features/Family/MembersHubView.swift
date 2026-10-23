@@ -174,7 +174,7 @@ struct MembersHubView: View {
         .searchable(text: $searchText,
                     prompt: Text("Search…"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 segmentButton
             }
             ToolbarItem(placement: .confirmationAction) {

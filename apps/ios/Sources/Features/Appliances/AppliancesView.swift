@@ -151,7 +151,7 @@ struct AppliancesView: View {
         .searchable(text: $search,
                     prompt: Text("Search appliances…"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .pageMenu) {
                 filterButton
             }
             ToolbarItem(placement: .topBarTrailing) {

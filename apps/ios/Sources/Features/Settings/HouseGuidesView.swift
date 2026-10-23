@@ -171,7 +171,7 @@ struct GuideDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if propertyService.hasWriteAccess, let guide {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .pageMenu) {
                     Menu {
                         Button { showEdit = true } label: {
                             Label("guide_edit", systemImage: "pencil")
