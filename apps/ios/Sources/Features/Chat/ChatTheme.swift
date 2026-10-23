@@ -242,10 +242,10 @@ struct ChatTheme: Identifiable {
         }
     }
 
-    // The wallpaper must be anchored to the SCREEN, not to the message list's
+    // The wallpaper must be anchored to the WINDOW, not to the message list's
     // keyboard-shrunk frame. Ignoring the `.all` safe-area regions (container
     // + keyboard) keeps the layer's bounds full-bleed — and the explicit
-    // screen-sized frame inside `ChatWallpaperAnchor` makes the render
+    // window-sized frame inside `ChatWallpaperAnchor` makes the render
     // provably constant: even if some container re-proposes a smaller area
     // (keyboard avoidance, composer growth, reply/edit strips), a fixed frame
     // cannot rescale, so `scaledToFill` can never zoom or pan the photo.
@@ -274,7 +274,7 @@ struct ChatTheme: Identifiable {
     /// The same visual layers as `background`, WITHOUT the screen-anchored
     /// frame — for previews that render the theme INSIDE a card (Profile's
     /// chat card, the hub's theme hero). The anchor's fixed
-    /// `UIScreen`-sized frame is the chat surface's keyboard contract; put
+    /// window-sized frame is the chat surface's keyboard contract; put
     /// inside a card it inflates the card to full screen width, blowing
     /// past the page's 20pt margins (IMG_8592). Here the card's own frame
     /// + clip bound the layers instead.
@@ -871,24 +871,91 @@ struct BackgroundPicker: View {
     }
 }
 
-// MARK: - Screen-anchored wallpaper layer
+// MARK: - Window-anchored wallpaper layer
 
-/// Pins a chat wallpaper layer to the physical screen. Two guarantees stack:
+/// Pins a chat wallpaper layer to the hosting window. Two guarantees stack:
 /// `.ignoresSafeArea(.all)` keeps the layer's bounds out of every safe-area
-/// negotiation (container AND keyboard), and the explicit screen-sized frame
+/// negotiation (container AND keyboard), and the explicit window-sized frame
 /// makes the render constant even if some ancestor still re-proposes a
 /// smaller area — a fixed frame cannot rescale, so `scaledToFill` content can
 /// never zoom or pan when the keyboard rises, the composer grows a line, or
 /// a reply/edit strip appears. Every chat surface (DM, group, communities,
 /// Yuna) draws its background through this one anchor.
+///
+/// The size comes from the view's own window, never the main screen: apps
+/// are resizable (iPad windowing, iPhone Mirroring), so the window is the
+/// only truthful canvas. Full screen, window bounds equal screen bounds —
+/// the render is unchanged; a resized window re-anchors on the next layout
+/// pass. Until the window is known (the first layout) the frame stays
+/// flexible, so nothing renders blank.
 struct ChatWallpaperAnchor<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
+    @State private var windowSize: CGSize?
+
     var body: some View {
-        let size = UIScreen.main.bounds.size
-        content()
-            .frame(width: size.width, height: size.height)
-            .clipped()
+        // The probe rides on a flexible base that follows the container, so a
+        // window resize reaches it even though the wallpaper's own frame is
+        // fixed; the wallpaper is centred on that base exactly as the fixed
+        // frame was centred before.
+        Color.clear
+            .background {
+                WindowSizeReader { size in
+                    if windowSize != size { windowSize = size }
+                }
+            }
+            .overlay {
+                content()
+                    .frame(width: windowSize?.width, height: windowSize?.height)
+                    .clipped()
+            }
             .ignoresSafeArea(.all)
+    }
+}
+
+/// Reports the hosting window's bounds — keyboard-independent by
+/// construction (the keyboard never resizes a window), and re-reported
+/// whenever the window itself is resized.
+private struct WindowSizeReader: UIViewRepresentable {
+    let onChange: (CGSize) -> Void
+
+    func makeUIView(context: Context) -> ProbeView {
+        let view = ProbeView()
+        view.onChange = onChange
+        return view
+    }
+
+    func updateUIView(_ uiView: ProbeView, context: Context) {
+        uiView.onChange = onChange
+    }
+
+    final class ProbeView: UIView {
+        var onChange: ((CGSize) -> Void)?
+        private var reported: CGSize?
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            isUserInteractionEnabled = false
+        }
+
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            report()
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            report()
+        }
+
+        private func report() {
+            guard let size = window?.bounds.size, size != .zero, size != reported else { return }
+            reported = size
+            // Hop out of the layout pass — SwiftUI state must not change
+            // mid-update.
+            DispatchQueue.main.async { [weak self] in self?.onChange?(size) }
+        }
     }
 }

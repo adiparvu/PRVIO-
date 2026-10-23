@@ -1,41 +1,53 @@
 import Foundation
-import MetricKit
 import Supabase
 
 // MARK: - MetricKit → Supabase telemetry
 //
-// The upload half of the app's telemetry: MetricsMonitor (AppDelegate)
-// already persists MetricKit payloads on-device; this second subscriber
-// ships each payload to the `app_metrics` table so launch-time, hang,
-// memory and crash regressions are visible across the fleet without a
-// device in hand. Strictly fire-and-forget: every failure path drops the
-// payload silently — telemetry must never block, error or crash the app.
+// The upload half of the app's telemetry: MetricsMonitor (AppDelegate) is
+// the app's one MetricKit subscriber — it persists every report on-device
+// and hands it here, and this service ships it to the `app_metrics` table
+// so launch-time, hang, memory and crash regressions are visible across
+// the fleet without a device in hand. Reports that arrive before sign-in
+// wait in a small buffer until `start()`. Strictly fire-and-forget: every
+// failure path drops the payload silently — telemetry must never block,
+// error or crash the app.
 
-final class MetricKitService: NSObject, MXMetricManagerSubscriber {
+final class MetricKitService: @unchecked Sendable {
     static let shared = MetricKitService()
-    private override init() { super.init() }
+    private init() {}
 
+    private let lock = NSLock()
     private var started = false
+    /// Reports delivered before the first sign-in (MetricKit hands them over
+    /// right after launch). Bounded — a launch that never signs in must not
+    /// hoard payloads.
+    private var pending: [(data: Data, kind: String)] = []
+    private static let maxPending = 20
 
     /// Idempotent: MainTabView's startup beat calls this once per sign-in.
+    /// Flushes whatever MetricsMonitor buffered before the session existed.
     func start() {
-        guard !started else { return }
+        lock.lock()
+        guard !started else { lock.unlock(); return }
         started = true
-        MXMetricManager.shared.add(self)
+        let backlog = pending
+        pending = []
+        lock.unlock()
+        for item in backlog { upload(item.data, kind: item.kind) }
     }
 
-    // MARK: MXMetricManagerSubscriber
-    //
-    // MetricKit delivers at most daily, on a background queue — uploads are
-    // rare, small, and never touch the main actor.
-
-    func didReceive(_ payloads: [MXMetricPayload]) {
-        for payload in payloads { upload(payload.jsonRepresentation(), kind: "metric") }
-    }
-
-    func didReceive(_ payloads: [MXDiagnosticPayload]) {
-        // Crashes and hangs — the signal that matters most.
-        for payload in payloads { upload(payload.jsonRepresentation(), kind: "diagnostic") }
+    /// Called by MetricsMonitor for every report, on MetricKit's background
+    /// delivery — uploads are rare, small, and never touch the main actor
+    /// beyond one read of the active property.
+    func submit(_ data: Data, kind: String) {
+        lock.lock()
+        guard started else {
+            if pending.count < Self.maxPending { pending.append((data, kind)) }
+            lock.unlock()
+            return
+        }
+        lock.unlock()
+        upload(data, kind: kind)
     }
 
     // MARK: Upload

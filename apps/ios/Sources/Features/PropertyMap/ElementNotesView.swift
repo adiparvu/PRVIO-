@@ -384,12 +384,12 @@ struct NotePINSheet: View {
                         .font(.headline)
                     SecureField("PIN (min 4 digits)", text: $pin)
                         .keyboardType(.numberPad)
-                        .textFieldStyle(.roundedBorder)
+                        .pinFieldStyle()
                         .frame(maxWidth: 220)
                     if mode == .setup {
                         SecureField("Confirm PIN", text: $confirm)
                             .keyboardType(.numberPad)
-                            .textFieldStyle(.roundedBorder)
+                            .pinFieldStyle()
                             .frame(maxWidth: 220)
                     }
                     if !error.isEmpty {
@@ -423,6 +423,23 @@ struct NotePINSheet: View {
                 error = String(localized: "Wrong PIN")
                 HapticFeedback.warning()
             }
+        }
+    }
+}
+
+// MARK: - PIN field style
+
+private extension View {
+    /// The system bordered text field with a rounded-rectangle border — iOS
+    /// 27's `.bordered` style; `.roundedBorder` (soft deprecated) on earlier
+    /// systems renders the same shape.
+    @ViewBuilder
+    func pinFieldStyle() -> some View {
+        if #available(iOS 27.0, *) {
+            textFieldStyle(.bordered)
+                .textInputBorderShape(.roundedRectangle)
+        } else {
+            textFieldStyle(.roundedBorder)
         }
     }
 }

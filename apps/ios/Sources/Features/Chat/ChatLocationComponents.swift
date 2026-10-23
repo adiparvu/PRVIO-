@@ -6,9 +6,10 @@ import CoreLocation
 // MARK: - Navigation app hand-off (Hărți / Hărți Google / Waze)
 
 /// Launches turn-by-turn directions to a coordinate in the user's choice of
-/// installed navigation app. Apple Maps is always offered; Google Maps and
-/// Waze only appear when actually installed (checked via canOpenURL, which
-/// requires their schemes in LSApplicationQueriesSchemes).
+/// navigation app. Apple Maps is always available; Google Maps and Waze are
+/// tried through their app scheme first and fall back to their universal
+/// link when the app isn't installed — open-and-handle-failure, never a
+/// `canOpenURL` probe (deprecated in iOS 27), so no scheme needs declaring.
 enum NavigationAppLauncher {
     struct Option: Identifiable { let id: String; let label: String }
 
@@ -20,32 +21,35 @@ enum NavigationAppLauncher {
          Option(id: "waze",   label: "Waze")]
     }
 
-    private static func canOpen(_ scheme: String) -> Bool {
-        guard let url = URL(string: scheme) else { return false }
-        return UIApplication.shared.canOpenURL(url)
-    }
-
     /// Opens directions to (lat, lon) in the chosen app. `label` names the
     /// destination (e.g. the sender's name) in Apple Maps' pin/callout.
     static func open(_ optionId: String, lat: Double, lon: Double, label: String) {
         let encodedLabel = label.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Location"
-        let url: URL?
         switch optionId {
         case "google":
-            url = canOpen("comgooglemaps://")
-                ? URL(string: "comgooglemaps://?daddr=\(lat),\(lon)&directionsmode=driving")
-                : URL(string: "https://www.google.com/maps/dir/?api=1&destination=\(lat),\(lon)")
+            open(URL(string: "comgooglemaps://?daddr=\(lat),\(lon)&directionsmode=driving"),
+                 fallback: URL(string: "https://www.google.com/maps/dir/?api=1&destination=\(lat),\(lon)"))
         case "waze":
-            url = canOpen("waze://")
-                ? URL(string: "waze://?ll=\(lat),\(lon)&navigate=yes")
-                : URL(string: "https://waze.com/ul?ll=\(lat),\(lon)&navigate=yes")
+            open(URL(string: "waze://?ll=\(lat),\(lon)&navigate=yes"),
+                 fallback: URL(string: "https://waze.com/ul?ll=\(lat),\(lon)&navigate=yes"))
         default:
             // daddr= (directions to) triggers Apple Maps' driving-ETA callout,
             // matching the native "car icon + N minutes" preview.
-            url = URL(string: "http://maps.apple.com/?daddr=\(lat),\(lon)&q=\(encodedLabel)")
+            open(URL(string: "http://maps.apple.com/?daddr=\(lat),\(lon)&q=\(encodedLabel)"), fallback: nil)
         }
-        guard let url else { return }
-        UIApplication.shared.open(url)
+    }
+
+    /// Tries the app URL; when no installed app takes it (completion reports
+    /// `false`), opens the universal link instead.
+    private static func open(_ url: URL?, fallback: URL?) {
+        guard let url else {
+            if let fallback { UIApplication.shared.open(fallback) }
+            return
+        }
+        UIApplication.shared.open(url, options: [:]) { opened in
+            guard !opened, let fallback else { return }
+            UIApplication.shared.open(fallback)
+        }
     }
 }
 
