@@ -17,11 +17,17 @@ enum WatchPage: Hashable {
 
 // MARK: - Double tap
 //
-// The two-finger double-tap fires each page's PRIMARY action without
-// touching the screen. watchOS 11+ only; earlier systems simply ignore it.
-extension View {
+// The double-tap gesture fires a screen's PRIMARY action without touching
+// it. HIG: never set a primary action in a view with a list, a scroll view
+// or vertical tabs — there double tap belongs to the system's own
+// navigation (scrolling, paging). The root pager is .verticalPage and every
+// list/detail page scrolls, so the only legal host is a screen that cannot
+// scroll at all. The name says so and the extension is fileprivate, so no
+// list row, toolbar or ScrollView elsewhere can quietly reclaim it.
+// watchOS 11+ only; earlier systems simply ignore it.
+fileprivate extension View {
     @ViewBuilder
-    func primaryDoubleTap() -> some View {
+    func primaryDoubleTapOnFixedScreen() -> some View {
         if #available(watchOS 11.0, *) {
             self.handGestureShortcut(.primaryAction)
         } else {
@@ -53,27 +59,21 @@ enum WatchDesign {
     }
 }
 
-/// The soft rounded card every module sits in. On watchOS 26 it wears real
-/// Liquid Glass (tinted); earlier systems keep the gradient fill — one
-/// authority, so the whole app upgrades the day the target does.
+/// The soft rounded card every module sits in. Cards are CONTENT, not
+/// chrome: HIG keeps Liquid Glass out of the content layer (it belongs to
+/// the system toolbar and controls floating above), so on every watchOS the
+/// card wears the same standard fill the list rows use — the domain tint
+/// breathing through, never a glass pane competing with the real chrome.
 private struct WatchCard<Content: View>: View {
     var tint: Color = .gray
     @ViewBuilder var content: Content
 
     var body: some View {
-        if #available(watchOS 26.0, *) {
-            padded.glassEffect(.regular.tint(tint.opacity(0.3)),
-                               in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        } else {
-            padded.background(WatchDesign.cardFill(tint),
-                              in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        }
-    }
-
-    private var padded: some View {
         content
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .background(WatchDesign.cardFill(tint),
+                        in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }
 
@@ -288,10 +288,10 @@ struct WatchRootView: View {
             // wrist's own black box (see WatchCrashRecorder).
             if let note = store.lastCrashNote {
                 Text("watch_crash_title")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundStyle(.red)
                 Text(verbatim: note)
-                    .font(.system(size: 9, design: .monospaced))
+                    .font(.system(.caption2, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .lineLimit(6)
             }
@@ -366,7 +366,7 @@ private struct WatchModuleGrid: View {
                         } label: {
                             VStack(spacing: 5) {
                                 Image(systemName: module.icon)
-                                    .font(.system(size: 19, weight: .semibold))
+                                    .font(.title3.weight(.semibold))
                                     .foregroundStyle(module.tint)
                                     .frame(width: 46, height: 46)
                                     .background(module.tint.opacity(0.18), in: Circle())
@@ -503,26 +503,19 @@ private struct TodayGlance: View {
             WatchCard(tint: .teal) {
                 HStack(spacing: 6) {
                     Image(systemName: "timer")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.teal)
                     VStack(alignment: .leading, spacing: 0) {
                         Text(session.title)
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.caption2.weight(.medium))
                             .lineLimit(1)
-                        // Computed elapsed (not Text(style: .timer), which
-                        // counts wall-clock from startedAt) so paused time is
-                        // excluded and a pause truly freezes the readout —
-                        // the same clock WorkSessionView shows.
-                        TimelineView(.periodic(from: .now, by: 1)) { context in
-                            Text(verbatim: session.elapsed(at: context.date).watchSessionClock)
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
-                                .monospacedDigit()
-                                .foregroundStyle(session.isPaused ? .orange : .primary)
-                        }
+                        // The same clock WorkSessionView shows.
+                        SessionClock(session: session,
+                                     font: .system(.headline, design: .rounded).weight(.bold))
                     }
                     Spacer(minLength: 0)
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.caption2.weight(.semibold))
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -567,17 +560,17 @@ private struct TodayGlance: View {
                     // The house streak — consecutive verified all-clear days.
                     HStack(spacing: 3) {
                         Image(systemName: "flame.fill")
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.caption2.weight(.semibold))
                             .foregroundStyle(.orange)
                             .symbolEffect(.bounce, value: streak)
                         Text(String(format: String(localized: "watch_streak"), streak))
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .font(.system(.caption2, design: .rounded).weight(.semibold))
                             .foregroundStyle(.orange)
                             .contentTransition(.numericText())
                     }
                 } else if snapshot.propertyHealthScore != nil {
                     Text("watch_health")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.caption2.weight(.medium))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -595,7 +588,7 @@ private struct TodayGlance: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 4) {
                         Image(systemName: icon)
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.caption.weight(.semibold))
                             .symbolRenderingMode(.hierarchical)
                             .foregroundStyle(urgent ? .red : tint)
                         if urgent {
@@ -605,10 +598,10 @@ private struct TodayGlance: View {
                         Spacer(minLength: 0)
                     }
                     Text(verbatim: "\(count)")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(.system(.title2, design: .rounded).weight(.bold))
                         .contentTransition(.numericText())
                     Text(label)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.caption2.weight(.medium))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -625,24 +618,24 @@ private struct TodayGlance: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Image(systemName: symbol)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.body.weight(.semibold))
                         .symbolRenderingMode(.multicolor)
                     Text(verbatim: "\(Int(temp.rounded()))°")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(.title3, design: .rounded).weight(.bold))
                         .contentTransition(.numericText())
                     Spacer(minLength: 0)
                     if let lo = payload.weatherLo, let hi = payload.weatherHi {
                         Text(verbatim: "\(Int(lo.rounded()))°–\(Int(hi.rounded()))°")
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .font(.system(.caption, design: .rounded).weight(.medium))
                             .foregroundStyle(.secondary)
                     }
                 }
                 if let advisory = payload.weatherAdvisory {
                     HStack(spacing: 4) {
                         Image(systemName: advisory == "frost" ? "snowflake" : "cloud.rain.fill")
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.caption2.weight(.semibold))
                         Text(advisory == "frost" ? "watch_adv_frost" : "watch_adv_rain")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.caption2.weight(.medium))
                             .lineLimit(2)
                     }
                     .foregroundStyle(.orange)
@@ -660,10 +653,10 @@ private struct TodayGlance: View {
         WatchCard(tint: .blue) {
             HStack(spacing: 6) {
                 Image(systemName: "message.fill")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.blue)
                 Text(verbatim: "\(count)")
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.system(.headline, design: .rounded).weight(.bold))
                 Text("watch_unread")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -681,7 +674,7 @@ private struct TodayGlance: View {
         WatchCard(tint: .purple) {
             HStack(alignment: .top, spacing: 6) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.purple)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
@@ -689,7 +682,7 @@ private struct TodayGlance: View {
                         .lineLimit(2)
                     if let body, !body.isEmpty {
                         Text(body)
-                            .font(.system(size: 11))
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(3)
                     }
@@ -706,7 +699,7 @@ private struct TodayGlance: View {
         WatchCard(tint: tint) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.footnote.weight(.semibold))
                     .foregroundStyle(tint == .gray ? .secondary : tint)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(title)
@@ -714,7 +707,7 @@ private struct TodayGlance: View {
                         .lineLimit(2)
                     if let sub {
                         Text(sub)
-                            .font(.system(size: 11))
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -759,27 +752,19 @@ private struct HealthRing: View {
 
 /// The leading action symbol: tap → it fills and bounces, a beat later the
 /// real action fires and the row animates out. The pause is the celebration.
+/// Rows live in Lists inside the vertical pager, so no row ever owns the
+/// double-tap primary action (see primaryDoubleTapOnFixedScreen).
 private struct ActingSymbol: View {
     let idle: String
     let acted: String
     let tint: Color
     let label: LocalizedStringKey
-    /// Marks this control as the page's double-tap primary action.
-    var isPrimary = false
     let action: () -> Void
 
     @State private var didAct = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        if isPrimary {
-            core.primaryDoubleTap()
-        } else {
-            core
-        }
-    }
-
-    private var core: some View {
         Button {
             guard !didAct else { return }
             didAct = true
@@ -793,7 +778,7 @@ private struct ActingSymbol: View {
             }
         } label: {
             Image(systemName: didAct ? acted : idle)
-                .font(.system(size: 17, weight: didAct ? .semibold : .light))
+                .font(.body.weight(didAct ? .semibold : .light))
                 .foregroundStyle(didAct ? tint : .secondary)
                 .contentTransition(.symbolEffect(.replace))
                 .symbolEffect(.bounce, value: didAct)
@@ -844,14 +829,14 @@ private struct MessagesPage: View {
                     .font(.system(.footnote, design: .rounded).weight(.semibold))
                     .lineLimit(1)
                 DMPreviewText(convo: convo)
-                    .font(.system(size: 11))
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
             Spacer(minLength: 0)
             if convo.unread > 0 {
                 Text(verbatim: "\(min(convo.unread, 99))")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(.caption2, design: .rounded).weight(.bold))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 5)
                     .padding(.vertical, 1)
@@ -902,7 +887,7 @@ private struct DMThreadDetail: View {
                         .foregroundStyle(.primary)
                     if let at = convo.lastAt {
                         Text(at, format: .relative(presentation: .named))
-                            .font(.system(size: 10))
+                            .font(.caption2)
                             .foregroundStyle(.tertiary)
                     }
                 }
@@ -932,7 +917,6 @@ private struct DMThreadDetail: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(justSent ? .green : .blue)
-                .primaryDoubleTap()
             }
         }
         .navigationTitle(Text(verbatim: convo.peerName))
@@ -967,8 +951,7 @@ private struct TasksPage: View {
                                 ActingSymbol(idle: "circle",
                                              acted: "checkmark.circle.fill",
                                              tint: task.isOverdue == true ? .red : .blue,
-                                             label: "watch_complete",
-                                             isPrimary: task.id == open.first?.id) {
+                                             label: "watch_complete") {
                                     withAnimation(.snappy) { store.completeTask(task.id) }
                                 }
                                 VStack(alignment: .leading, spacing: 1) {
@@ -977,7 +960,7 @@ private struct TasksPage: View {
                                         .lineLimit(2)
                                     if task.isOverdue == true {
                                         Text("watch_overdue")
-                                            .font(.system(size: 10, weight: .semibold))
+                                            .font(.caption2.weight(.semibold))
                                             .foregroundStyle(.red)
                                     }
                                 }
@@ -1044,7 +1027,6 @@ private struct TaskDetail: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.blue)
-                .primaryDoubleTap()
 
                 // Time the work: start a session, get on with the job.
                 Button {
@@ -1076,69 +1058,22 @@ private struct WorkSessionView: View {
     @Environment(\.dismiss) private var dismiss
 
     /// Minute ticker for the quarter-hour haptic — fires only while this
-    /// screen is up; the elapsed display itself needs no timer at all
-    /// (Text(style: .timer) is system-driven).
+    /// screen is up; the elapsed display runs on its own TimelineView
+    /// (SessionClock), which the system throttles in Always On.
     private let minuteTick = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
 
     var body: some View {
         if let session = store.activeSession {
-            ScrollView {
-                VStack(spacing: 12) {
-                    Image(systemName: "timer")
-                        .font(.title3)
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(.teal)
-                        .symbolEffect(.pulse)
-                    Text(session.title)
-                        .font(.system(.footnote, design: .rounded).weight(.semibold))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                    // Computed elapsed (not Text(style:.timer)) so a pause
-                    // truly freezes it; excludes paused time.
-                    TimelineView(.periodic(from: .now, by: 1)) { context in
-                        Text(verbatim: session.elapsed(at: context.date).watchSessionClock)
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(session.isPaused ? .orange : .primary)
-                    }
-
-                    // Pause / Resume
-                    Button {
-                        store.toggleSessionPause()
-                    } label: {
-                        Label {
-                            Text(session.isPaused ? "watch_session_resume" : "watch_session_pause")
-                        } icon: {
-                            Image(systemName: session.isPaused ? "play.fill" : "pause.fill")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(session.isPaused ? .green : .orange)
-
-                    Button {
-                        store.endSession(completingTask: true)
-                        dismiss()
-                    } label: {
-                        Label { Text("watch_complete") } icon: {
-                            Image(systemName: "checkmark.circle.fill")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.teal)
-                    .primaryDoubleTap()
-
-                    Button {
-                        store.endSession(completingTask: false)
-                        dismiss()
-                    } label: {
-                        Label { Text("watch_session_end") } icon: {
-                            Image(systemName: "stop.circle")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
+            // The one screen allowed to own double tap: it must not scroll
+            // (HIG). The fixed layout wins whenever it fits; when it can't
+            // (a small case at a large Dynamic Type size) the same layout
+            // scrolls and gives the gesture back to the system.
+            ViewThatFits(in: .vertical) {
+                layout(session, ownsDoubleTap: true)
+                ScrollView {
+                    layout(session, ownsDoubleTap: false)
                 }
             }
             .onReceive(minuteTick) { _ in
@@ -1152,6 +1087,104 @@ private struct WorkSessionView: View {
         } else {
             AllClearView(icon: "timer")
                 .onAppear { dismiss() }
+        }
+    }
+
+    /// Compact by design so it fits without scrolling: pause and stop share
+    /// one row as icon buttons (their titles stay as accessibility labels),
+    /// leaving the full-width Complete as the obvious primary action.
+    private func layout(_ session: WatchStore.WorkSession, ownsDoubleTap: Bool) -> some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 4) {
+                Image(systemName: "timer")
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(.teal)
+                    // Always On: no animation on a dimmed, rarely-redrawn face.
+                    .symbolEffect(.pulse, isActive: !isLuminanceReduced)
+                Text(session.title)
+                    .lineLimit(1)
+            }
+            .font(.system(.footnote, design: .rounded).weight(.semibold))
+            .opacity(isLuminanceReduced ? 0.6 : 1)
+
+            SessionClock(session: session,
+                         font: .system(.largeTitle, design: .rounded).weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+
+            HStack(spacing: 6) {
+                Button {
+                    store.toggleSessionPause()
+                } label: {
+                    Label {
+                        Text(session.isPaused ? "watch_session_resume" : "watch_session_pause")
+                    } icon: {
+                        Image(systemName: session.isPaused ? "play.fill" : "pause.fill")
+                    }
+                    .labelStyle(.iconOnly)
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(session.isPaused ? .green : .orange)
+
+                Button {
+                    store.endSession(completingTask: false)
+                    dismiss()
+                } label: {
+                    Label { Text("watch_session_end") } icon: {
+                        Image(systemName: "stop.fill")
+                    }
+                    .labelStyle(.iconOnly)
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+            .opacity(isLuminanceReduced ? 0.6 : 1)
+
+            completeButton(ownsDoubleTap: ownsDoubleTap)
+        }
+    }
+
+    @ViewBuilder
+    private func completeButton(ownsDoubleTap: Bool) -> some View {
+        let button = Button {
+            store.endSession(completingTask: true)
+            dismiss()
+        } label: {
+            Label { Text("watch_complete") } icon: {
+                Image(systemName: "checkmark.circle.fill")
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.teal)
+
+        if ownsDoubleTap {
+            button.primaryDoubleTapOnFixedScreen()
+        } else {
+            button
+        }
+    }
+}
+
+/// The live session readout. Computed elapsed (not Text(style: .timer),
+/// which counts wall-clock from startedAt) so a pause truly freezes it and
+/// paused time is excluded. Always On: when the system demotes the timeline
+/// to minute cadence the seconds digit can't stay honest, so the readout
+/// drops to h:mm until the wrist is raised again.
+private struct SessionClock: View {
+    let session: WatchStore.WorkSession
+    let font: Font
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let elapsed = session.elapsed(at: context.date)
+            Text(verbatim: context.cadence >= .minutes
+                 ? elapsed.watchSessionClockMinutes
+                 : elapsed.watchSessionClock)
+                .font(font)
+                .monospacedDigit()
+                .foregroundStyle(session.isPaused ? .orange : .primary)
         }
     }
 }
@@ -1176,9 +1209,7 @@ private struct PlantsPage: View {
                                 ActingSymbol(idle: "drop",
                                              acted: "drop.fill",
                                              tint: .cyan,
-                                             label: "watch_water_now",
-                                             isPrimary: thirsty.count == 1
-                                                        && plant.id == thirsty.first?.id) {
+                                             label: "watch_water_now") {
                                     withAnimation(.snappy) { store.waterPlant(plant.id) }
                                 }
                                 Text(plant.emoji)
@@ -1204,14 +1235,13 @@ private struct PlantsPage: View {
             .toolbar {
                 if thirsty.count > 1 {
                     ToolbarItem(placement: .topBarTrailing) {
-                        // With several thirsty plants, double-tap waters all.
+                        // With several thirsty plants, one tap waters all.
                         Button {
                             withAnimation(.snappy) { store.waterAllPlants() }
                         } label: {
                             Image(systemName: "drop.fill")
                         }
                         .accessibilityLabel(Text("watch_water_all"))
-                        .primaryDoubleTap()
                     }
                 }
             }
@@ -1228,7 +1258,7 @@ private struct PlantDetail: View {
         ScrollView {
             VStack(spacing: 12) {
                 Text(plant.emoji)
-                    .font(.system(size: 44))
+                    .font(.largeTitle)
                 Text(plant.name)
                     .font(.system(.headline, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -1244,7 +1274,6 @@ private struct PlantDetail: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.cyan)
-                .primaryDoubleTap()
             }
             .frame(maxWidth: .infinity)
         }
@@ -1273,8 +1302,7 @@ private struct ShoppingPage: View {
                             ActingSymbol(idle: "circle",
                                          acted: "checkmark.circle.fill",
                                          tint: .orange,
-                                         label: "watch_tap_check",
-                                         isPrimary: item.id == pending.first?.id) {
+                                         label: "watch_tap_check") {
                                 withAnimation(.snappy) { store.checkSupply(item.id) }
                             }
                             Text(item.name)
@@ -1309,8 +1337,7 @@ private struct PantryPage: View {
                     AllClearView(icon: "basket")
                 } else {
                     List(stocked, id: \.id) { item in
-                        PantryRow(item: item,
-                                  isPrimary: item.id == stocked.first?.id) {
+                        PantryRow(item: item) {
                             store.consumePantry(item.id)
                         }
                         // Swipe → straight onto the shopping list: the phone
@@ -1340,10 +1367,10 @@ private struct PantryPage: View {
 }
 
 /// Repeatable consume row — unlike the one-shot ActingSymbol, stock can be
-/// consumed again and again; the icon bounces on every unit.
+/// consumed again and again; the icon bounces on every unit. A List row, so
+/// never the double-tap primary action.
 private struct PantryRow: View {
     let item: PantryCatalogEntry
-    var isPrimary = false
     let consume: () -> Void
 
     private var quantityLabel: String {
@@ -1360,7 +1387,7 @@ private struct PantryRow: View {
                     .font(.system(.footnote, design: .rounded))
                     .lineLimit(1)
                 Text(verbatim: quantityLabel)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.system(.caption2, design: .rounded).weight(.semibold))
                     .foregroundStyle(item.quantity <= 0 ? .red : .secondary)
                     .contentTransition(.numericText())
             }
@@ -1368,20 +1395,12 @@ private struct PantryRow: View {
         }
     }
 
-    @ViewBuilder private var consumeButton: some View {
-        if isPrimary {
-            core.primaryDoubleTap()
-        } else {
-            core
-        }
-    }
-
-    private var core: some View {
+    private var consumeButton: some View {
         Button {
             withAnimation(.snappy) { consume() }
         } label: {
             Image(systemName: "minus.circle.fill")
-                .font(.system(size: 17))
+                .font(.body)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(item.quantity > 0 ? .green : .secondary)
                 .symbolEffect(.bounce, value: item.quantity)
@@ -1417,22 +1436,21 @@ private struct DeliveriesPage: View {
                             ActingSymbol(idle: "circle",
                                          acted: "checkmark.seal.fill",
                                          tint: .green,
-                                         label: "watch_delivery_received",
-                                         isPrimary: parcel.id == deliveries.first(where: Self.isActive)?.id) {
+                                         label: "watch_delivery_received") {
                                 withAnimation(.snappy) { store.markDeliveryReceived(parcel.id) }
                             }
                         }
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 6) {
                                 Image(systemName: DeliveryGlyphs.icon(for: parcel.status))
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .font(.caption.weight(.semibold))
                                     .foregroundStyle(parcel.status == "out_for_delivery" ? .orange : .secondary)
                                 Text(parcel.title)
                                     .font(.system(.footnote, design: .rounded))
                                     .lineLimit(2)
                             }
                             DeliveryGlyphs.statusLabel(for: parcel.status)
-                                .font(.system(size: 11))
+                                .font(.caption2)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
@@ -1496,7 +1514,6 @@ private struct DeliveryDetail: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.green)
-                    .primaryDoubleTap()
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -1539,11 +1556,14 @@ private struct PropertyMapPage: View {
                             .fill(Color.blue.opacity(0.25))
                             .frame(width: 30, height: 30)
                         Image(systemName: "house.fill")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.caption.weight(.semibold))
                             .foregroundStyle(.white)
                             .frame(width: 22, height: 22)
                             .background(Circle().fill(Color.blue))
                     }
+                    // The pin is fixed map geometry; its glyph scales only
+                    // as far as the 22 pt disc can hold.
+                    .dynamicTypeSize(...DynamicTypeSize.large)
                 }
             }
             .navigationTitle(Text("watch_map"))
@@ -1625,7 +1645,7 @@ private struct ControlsPage: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 Image(systemName: a.kind == "cover" ? "door.garage.closed" : "power")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.footnote.weight(.semibold))
                     .foregroundStyle(.purple)
                 Text(verbatim: a.name)
                     .font(.system(.footnote, design: .rounded).weight(.semibold))
@@ -1675,7 +1695,7 @@ private struct ControlsPage: View {
             store.sendCommand(actuatorId: a.id, command: command)
         } label: {
             Image(systemName: icon)
-                .font(.system(size: 15, weight: .bold))
+                .font(.body.weight(.bold))
                 .frame(maxWidth: .infinity, minHeight: 34)
         }
         .buttonStyle(.borderedProminent)
@@ -1720,7 +1740,7 @@ private struct SensorsPage: View {
         let accent: Color = s.isCritical ? .red : (s.isAlerting ? .orange : .mint)
         return HStack(spacing: 8) {
             Image(systemName: s.icon)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.body.weight(.semibold))
                 .foregroundStyle(accent)
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 1) {
@@ -1873,7 +1893,7 @@ private struct EmergencyPage: View {
             Link(destination: url) {
                 HStack(spacing: 8) {
                     Image(systemName: "phone.fill")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.footnote.weight(.semibold))
                         .foregroundStyle(.green)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(verbatim: contact.name)

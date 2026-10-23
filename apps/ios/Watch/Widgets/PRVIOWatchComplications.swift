@@ -32,7 +32,7 @@ struct PRVIOStatusComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: WatchPayloadProvider()) { entry in
             ComplicationView(payload: entry.payload)
-                .modifier(ComplicationBackground())
+                .modifier(ComplicationBackground(tone: .of(.status, entry.payload)))
         }
         .configurationDisplayName("PRVIO")
         .description(NSLocalizedString("watch_complication_desc", comment: ""))
@@ -59,7 +59,7 @@ struct PRVIOTasksComplication: Widget {
                 topTaskId: open.first?.id,
                 url: URL(string: "prvio://tasks")
             )
-            .modifier(ComplicationBackground())
+            .modifier(ComplicationBackground(tone: .of(.tasks, entry.payload)))
         }
         .configurationDisplayName("PRVIO · Tasks")
         .description(NSLocalizedString("watch_comp_tasks_desc", comment: ""))
@@ -199,9 +199,11 @@ private struct HealthComplicationView: View {
                         .font(.system(.body, design: .rounded).weight(.bold))
                 }
                 .gaugeStyle(.accessoryCircular)
+                .widgetAccentable()
             case .accessoryCorner:
                 Text(verbatim: "\(score ?? 0)%")
                     .font(.system(.title3, design: .rounded).weight(.bold))
+                    .widgetAccentable()
                     .widgetCurvesContent()
                     .widgetLabel { Text("watch_health") }
             case .accessoryRectangular:
@@ -215,6 +217,7 @@ private struct HealthComplicationView: View {
                     }
                     Gauge(value: value, in: 0...100) { EmptyView() }
                         .gaugeStyle(.accessoryLinearCapacity)
+                        .widgetAccentable()
                     Text(verbatim: "\(score ?? 0)%")
                         .font(.system(size: 12, weight: .bold, design: .rounded))
                         .foregroundStyle(.secondary)
@@ -244,23 +247,34 @@ private struct DomainComplicationView: View {
     let url: URL?
 
     @Environment(\.widgetFamily) private var family
+    @Environment(\.widgetRenderingMode) private var renderingMode
 
     var body: some View {
         Group {
             switch family {
             case .accessoryCircular:
                 VStack(spacing: 0) {
-                    Image(systemName: icon)
-                        .font(.system(size: 12, weight: .semibold))
-                        .symbolRenderingMode(.hierarchical)
+                    HStack(spacing: 1) {
+                        Image(systemName: icon)
+                            .symbolRenderingMode(.hierarchical)
+                            .widgetAccentable()
+                        if urgent {
+                            UrgentGlyph()
+                        }
+                    }
+                    .font(.system(size: 12, weight: .semibold))
                     Text(verbatim: "\(count)")
                         .font(.system(.body, design: .rounded).weight(.bold))
-                        .foregroundStyle(urgent ? AnyShapeStyle(.red) : AnyShapeStyle(.primary))
+                        .foregroundStyle(renderingMode.urgentStyle(urgent))
+                        .widgetAccentable()
                 }
             case .accessoryCorner:
-                Text(verbatim: "\(count)")
+                // The curved slot holds one text run, so urgency rides as a
+                // trailing "!" — readable on every face tint.
+                Text(verbatim: urgent ? "\(count)!" : "\(count)")
                     .font(.system(.title3, design: .rounded).weight(.bold))
-                    .foregroundStyle(urgent ? AnyShapeStyle(.red) : AnyShapeStyle(.primary))
+                    .foregroundStyle(renderingMode.urgentStyle(urgent))
+                    .widgetAccentable()
                     .widgetCurvesContent()
                     .widgetLabel { label }
             case .accessoryRectangular:
@@ -269,12 +283,20 @@ private struct DomainComplicationView: View {
                         HStack(spacing: 4) {
                             Image(systemName: icon)
                                 .font(.system(size: 11, weight: .semibold))
+                                .widgetAccentable()
                             label
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        Text(verbatim: "\(count)")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundStyle(urgent ? AnyShapeStyle(.red) : AnyShapeStyle(.primary))
+                        HStack(spacing: 4) {
+                            Text(verbatim: "\(count)")
+                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .foregroundStyle(renderingMode.urgentStyle(urgent))
+                                .widgetAccentable()
+                            if urgent {
+                                UrgentGlyph()
+                                    .font(.system(size: 13, weight: .semibold))
+                            }
+                        }
                         ForEach(Array(lines.prefix(2).enumerated()), id: \.offset) { _, line in
                             Text(line)
                                 .font(.system(size: 11))
@@ -289,6 +311,7 @@ private struct DomainComplicationView: View {
                             Image(systemName: "checkmark.circle")
                                 .font(.system(size: 20, weight: .medium))
                                 .symbolRenderingMode(.hierarchical)
+                                .widgetAccentable()
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(Text("watch_complete"))
@@ -296,7 +319,7 @@ private struct DomainComplicationView: View {
                 }
             default:
                 HStack(spacing: 3) {
-                    Image(systemName: icon)
+                    Image(systemName: urgent ? "exclamationmark.circle.fill" : icon)
                     Text(verbatim: "\(count)")
                     label
                 }
@@ -428,7 +451,7 @@ struct PRVIOWeatherComplication: Widget {
         StaticConfiguration(kind: "PRVIOWatchWeather",
                             provider: WatchPayloadProvider(domain: .weather)) { entry in
             WeatherComplicationView(payload: entry.payload)
-                .modifier(ComplicationBackground())
+                .modifier(ComplicationBackground(tone: .of(.weather, entry.payload)))
         }
         .configurationDisplayName("PRVIO · Weather")
         .description(NSLocalizedString("watch_comp_weather_desc", comment: ""))
@@ -445,6 +468,8 @@ private struct WeatherComplicationView: View {
     private var temp: Int? { payload?.weatherTemp.map { Int($0.rounded()) } }
     private var symbol: String { payload?.weatherSymbol ?? "cloud.sun.fill" }
     private var advisory: String? { payload?.weatherAdvisory }
+
+    @Environment(\.widgetRenderingMode) private var renderingMode
 
     private var advisoryText: Text? {
         switch advisory {
@@ -464,10 +489,12 @@ private struct WeatherComplicationView: View {
                         .symbolRenderingMode(.hierarchical)
                     Text(verbatim: temp.map { "\($0)°" } ?? "–")
                         .font(.system(.body, design: .rounded).weight(.bold))
+                        .widgetAccentable()
                 }
             case .accessoryCorner:
                 Text(verbatim: temp.map { "\($0)°" } ?? "–")
                     .font(.system(.title3, design: .rounded).weight(.bold))
+                    .widgetAccentable()
                     .widgetCurvesContent()
                     .widgetLabel { Text(payload?.snapshot.propertyName ?? "PRVIO") }
             case .accessoryRectangular:
@@ -483,6 +510,7 @@ private struct WeatherComplicationView: View {
                     HStack(spacing: 6) {
                         Text(verbatim: temp.map { "\($0)°" } ?? "–")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .widgetAccentable()
                         if let lo = payload?.weatherLo, let hi = payload?.weatherHi {
                             Text(verbatim: "\(Int(lo.rounded()))°–\(Int(hi.rounded()))°")
                                 .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -490,14 +518,23 @@ private struct WeatherComplicationView: View {
                         }
                     }
                     if let advisoryText {
-                        advisoryText
-                            .font(.system(size: 11))
-                            .foregroundStyle(.orange)
-                            .lineLimit(1)
+                        // The leading symbol keeps the advisory distinct
+                        // when the face flattens the orange.
+                        HStack(spacing: 3) {
+                            Image(systemName: advisory == "frost" ? "snowflake" : "cloud.rain.fill")
+                            advisoryText
+                                .lineLimit(1)
+                        }
+                        .font(.system(size: 11))
+                        .foregroundStyle(renderingMode == .fullColor
+                                         ? AnyShapeStyle(.orange) : AnyShapeStyle(.primary))
                     } else {
+                        // 11 pt is the HIG floor for widget text, attribution
+                        // included (it was 9 pt).
                         Text(verbatim: " Apple Weather")
-                            .font(.system(size: 9))
+                            .font(.system(size: 11))
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -516,7 +553,7 @@ struct PRVIOBudgetComplication: Widget {
         StaticConfiguration(kind: "PRVIOWatchBudget",
                             provider: WatchPayloadProvider(domain: .budget)) { entry in
             BudgetComplicationView(payload: entry.payload)
-                .modifier(ComplicationBackground())
+                .modifier(ComplicationBackground(tone: .of(.budget, entry.payload)))
         }
         .configurationDisplayName("PRVIO · Budget")
         .description(NSLocalizedString("watch_comp_budget_desc", comment: ""))
@@ -533,6 +570,8 @@ private struct BudgetComplicationView: View {
     private var spent: Double? { payload?.budgetSpent }
     private var limit: Double? { payload?.budgetLimit }
     private var code: String { payload?.budgetCurrency ?? "EUR" }
+
+    @Environment(\.widgetRenderingMode) private var renderingMode
     private var over: Bool {
         guard let spent, let limit else { return false }
         return spent > limit
@@ -562,11 +601,16 @@ private struct BudgetComplicationView: View {
                     Gauge(value: min(spent, limit), in: 0...limit) {
                         Image(systemName: "banknote.fill")
                     } currentValueLabel: {
-                        Text(verbatim: "\(Int((spent / limit * 100).rounded()))%")
+                        // Over budget: the trailing "!" says it on every face tint.
+                        let percent = "\(Int((spent / limit * 100).rounded()))%"
+                        Text(verbatim: over ? "\(percent)!" : percent)
                             .font(.system(.footnote, design: .rounded).weight(.bold))
-                            .foregroundStyle(over ? .red : .primary)
+                            .foregroundStyle(renderingMode.urgentStyle(over))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
                     }
                     .gaugeStyle(.accessoryCircularCapacity)
+                    .widgetAccentable()
                 } else {
                     VStack(spacing: 0) {
                         Image(systemName: "banknote.fill")
@@ -574,14 +618,17 @@ private struct BudgetComplicationView: View {
                             .symbolRenderingMode(.hierarchical)
                         Text(verbatim: spent.map(compact) ?? "–")
                             .font(.system(.footnote, design: .rounded).weight(.bold))
-                            .minimumScaleFactor(0.6)
+                            // Footnote may shrink, but never below the 11 pt floor.
+                            .minimumScaleFactor(0.85)
                             .lineLimit(1)
+                            .widgetAccentable()
                     }
                 }
             case .accessoryCorner:
-                Text(verbatim: spent.map(compact) ?? "–")
+                Text(verbatim: spent.map { over ? "\(compact($0))!" : compact($0) } ?? "–")
                     .font(.system(.title3, design: .rounded).weight(.bold))
-                    .foregroundStyle(over ? .red : .primary)
+                    .foregroundStyle(renderingMode.urgentStyle(over))
+                    .widgetAccentable()
                     .widgetCurvesContent()
                     .widgetLabel { Text("watch_budget") }
             case .accessoryRectangular:
@@ -594,15 +641,23 @@ private struct BudgetComplicationView: View {
                             .font(.system(size: 13, weight: .semibold))
                             .lineLimit(1)
                     }
-                    Text(verbatim: spent.map(money) ?? "–")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(over ? .red : .primary)
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Text(verbatim: spent.map(money) ?? "–")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundStyle(renderingMode.urgentStyle(over))
+                            .minimumScaleFactor(0.7)
+                            .lineLimit(1)
+                            .widgetAccentable()
+                        if over {
+                            UrgentGlyph()
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                    }
                     if let spent, let limit, limit > 0 {
                         Gauge(value: min(spent, limit), in: 0...limit) { EmptyView() }
                             .gaugeStyle(.accessoryLinearCapacity)
                             .tint(over ? .red : .green)
+                            .widgetAccentable()
                     } else {
                         Text(payload?.snapshot.propertyName ?? "PRVIO")
                             .font(.system(size: 11))
@@ -630,6 +685,8 @@ private struct ComplicationView: View {
     private var overdue: Int { payload?.snapshot.overdueTaskCount ?? 0 }
     private var water: Int { payload?.snapshot.plantsNeedingWater ?? 0 }
 
+    @Environment(\.widgetRenderingMode) private var renderingMode
+
     var body: some View {
         switch family {
         case .accessoryCircular:
@@ -652,12 +709,14 @@ private struct ComplicationView: View {
                 .font(.system(.body, design: .rounded).weight(.bold))
         }
         .gaugeStyle(.accessoryCircularCapacity)
+        .widgetAccentable()
         .widgetURL(URL(string: "prvio://"))
     }
 
     private var corner: some View {
-        Text(verbatim: "\(open)")
+        Text(verbatim: overdue > 0 ? "\(open)!" : "\(open)")
             .font(.system(.title3, design: .rounded).weight(.bold))
+            .widgetAccentable()
             .widgetCurvesContent()
             .widgetLabel {
                 Text("watch_tasks")
@@ -670,6 +729,7 @@ private struct ComplicationView: View {
             HStack(spacing: 4) {
                 Image(systemName: "house.fill")
                     .font(.system(size: 11, weight: .semibold))
+                    .widgetAccentable()
                 Text(payload?.snapshot.propertyName ?? "PRVIO")
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
@@ -699,11 +759,16 @@ private struct ComplicationView: View {
 
     private func statPair(icon: String, value: Int, urgent: Bool) -> some View {
         HStack(spacing: 2) {
-            Image(systemName: icon)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(urgent ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
+            // Urgent swaps the domain glyph for the exclamation mark — the
+            // cue survives accented faces, where red would not.
+            Image(systemName: urgent ? "exclamationmark.circle.fill" : icon)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(urgent && renderingMode == .fullColor
+                                 ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
+                .widgetAccentable(urgent)
             Text(verbatim: "\(value)")
                 .font(.system(size: 13, weight: .bold, design: .rounded))
+                .widgetAccentable()
         }
     }
 }
@@ -713,19 +778,78 @@ private struct ComplicationView: View {
 //
 // AccessoryWidgetBackground is designed for the circular faces; in the Smart
 // Stack's rectangular slot it rendered as a stray dark circle behind the
-// content. Rectangular and inline get a clear background instead.
+// content. The Smart Stack's default is plain black, and HIG asks for a
+// background that adds meaning: the rectangular card carries the state as
+// a quiet wash — warm when something is overdue/over, calm otherwise. The
+// wash only paints in full color; accented/vibrant faces would flatten it
+// into a grey slab, so they (and inline) keep a clear ground.
 
 struct ComplicationBackground: ViewModifier {
+    enum Tone {
+        case calm, warning
+
+        fileprivate var wash: LinearGradient {
+            let color: Color = self == .warning ? .orange : .teal
+            return LinearGradient(colors: [color.opacity(0.45), color.opacity(0.18)],
+                                  startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+    }
+
+    var tone: Tone = .calm
+
     @Environment(\.widgetFamily) private var family
+    @Environment(\.widgetRenderingMode) private var renderingMode
 
     func body(content: Content) -> some View {
         content.containerBackground(for: .widget) {
             if family == .accessoryCircular || family == .accessoryCorner {
                 AccessoryWidgetBackground()
+            } else if family == .accessoryRectangular && renderingMode == .fullColor {
+                tone.wash
             } else {
                 Color.clear
             }
         }
+    }
+}
+
+extension ComplicationBackground.Tone {
+    /// The state a domain's Smart Stack card should wear.
+    static func of(_ domain: WatchDomainOption, _ payload: WatchPayload?) -> Self {
+        switch domain {
+        case .status, .tasks:
+            return (payload?.snapshot.overdueTaskCount ?? 0) > 0 ? .warning : .calm
+        case .budget:
+            guard let spent = payload?.budgetSpent, let limit = payload?.budgetLimit else {
+                return .calm
+            }
+            return spent > limit ? .warning : .calm
+        case .weather:
+            return payload?.weatherAdvisory != nil ? .warning : .calm
+        case .water, .shopping, .deliveries, .health:
+            return .calm
+        }
+    }
+}
+
+// MARK: - Urgency without color
+//
+// Accented faces tint everything in one face color, and some wearers can't
+// tell red from the rest anyway — so every urgent state also carries a
+// glyph. Red is applied only where the face renders in full color.
+
+private struct UrgentGlyph: View {
+    var body: some View {
+        Image(systemName: "exclamationmark.circle.fill")
+            .symbolRenderingMode(.hierarchical)
+            .widgetAccentable()
+            .accessibilityHidden(true)
+    }
+}
+
+private extension WidgetRenderingMode {
+    func urgentStyle(_ urgent: Bool) -> AnyShapeStyle {
+        urgent && self == .fullColor ? AnyShapeStyle(.red) : AnyShapeStyle(.primary)
     }
 }
 
@@ -804,7 +928,7 @@ struct PRVIOChoiceComplication: Widget {
                                intent: PRVIODomainConfigIntent.self,
                                provider: ChoiceProvider()) { entry in
             ChoiceComplicationView(payload: entry.payload, domain: entry.domain)
-                .modifier(ComplicationBackground())
+                .modifier(ComplicationBackground(tone: .of(entry.domain, entry.payload)))
         }
         .configurationDisplayName("PRVIO +")
         .description(NSLocalizedString("watch_comp_choice_desc", comment: ""))

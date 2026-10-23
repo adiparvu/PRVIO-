@@ -56,6 +56,7 @@ private struct SessionComplicationView: View {
     let session: WatchWorkSession?
 
     @Environment(\.widgetFamily) private var family
+    @Environment(\.widgetRenderingMode) private var renderingMode
 
     /// The moment the timer text counts from: now minus the true elapsed
     /// (pauses excluded), so system timer text and the app's clock agree.
@@ -81,7 +82,8 @@ private struct SessionComplicationView: View {
     }
 
     /// Live elapsed for running sessions (system-driven, ticks on its own),
-    /// frozen orange clock while paused.
+    /// frozen orange clock while paused. Orange only in full color: accented
+    /// faces tint the accent group, and the pause glyph carries the state.
     @ViewBuilder
     private func elapsedText(size: CGFloat) -> some View {
         if let session, let start = timerStart {
@@ -89,12 +91,15 @@ private struct SessionComplicationView: View {
                 Text(verbatim: session.clockText(at: .now))
                     .font(.system(size: size, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(renderingMode == .fullColor
+                                     ? AnyShapeStyle(.orange) : AnyShapeStyle(.primary))
+                    .widgetAccentable()
             } else {
                 Text(timerInterval: start...start.addingTimeInterval(24 * 3600),
                      countsDown: false)
                     .font(.system(size: size, weight: .bold, design: .rounded))
                     .monospacedDigit()
+                    .widgetAccentable()
             }
         }
     }
@@ -105,9 +110,12 @@ private struct SessionComplicationView: View {
                   : (session?.isPaused == true ? "pause.fill" : "timer"))
                 .font(.system(size: 11, weight: .semibold))
                 .symbolRenderingMode(.hierarchical)
+                .widgetAccentable()
             if session != nil {
+                // 13 pt × 0.85 keeps even an hour-long readout at the
+                // 11 pt widget-text floor (0.6 dropped it to ~8 pt).
                 elapsedText(size: 13)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.85)
                     .lineLimit(1)
             } else {
                 Text(verbatim: "–")
@@ -139,6 +147,7 @@ private struct SessionComplicationView: View {
                     Image(systemName: session.isPaused ? "pause.fill" : "timer")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(session.isPaused ? .orange : .teal)
+                        .widgetAccentable()
                     Text(session.title)
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
@@ -160,6 +169,7 @@ private struct SessionComplicationView: View {
                 Text("watch_session_none")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

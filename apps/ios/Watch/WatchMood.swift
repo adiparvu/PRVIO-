@@ -158,16 +158,24 @@ private struct MoodPageGround: ViewModifier {
     let fallbackOpacity: Double
     @Environment(\.watchMood) private var mood
     @Environment(\.watchSky) private var sky
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
+
+    /// Always On: the wash is atmosphere, not information, so it recedes
+    /// further than the content it sits under — the dimmed face stays
+    /// mostly true black (legible, and cheap on the OLED).
+    private var dim: Double { isLuminanceReduced ? 0.4 : 1 }
 
     @ViewBuilder
     func body(content: Content) -> some View {
         if let sky {
             // F4: the phone's real weather sky beats the mood wash.
-            content.containerBackground(sky.pageWash, for: .navigation)
+            content.containerBackground(AnyShapeStyle(sky.pageWash).opacity(dim),
+                                         for: .navigation)
         } else if let mood {
-            content.containerBackground(mood.pageWash, for: .navigation)
+            content.containerBackground(AnyShapeStyle(mood.pageWash).opacity(dim),
+                                         for: .navigation)
         } else {
-            content.containerBackground(fallback.gradient.opacity(fallbackOpacity),
+            content.containerBackground(fallback.gradient.opacity(fallbackOpacity * dim),
                                          for: .navigation)
         }
     }

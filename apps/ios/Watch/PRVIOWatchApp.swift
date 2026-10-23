@@ -36,6 +36,14 @@ extension TimeInterval {
         return h > 0 ? String(format: "%d:%02d:%02d", h, m, s)
                      : String(format: "%d:%02d", m, s)
     }
+
+    /// "1:20" / "0:20" — h:mm with no seconds, for the Always On state:
+    /// a TimelineView demoted to minute cadence can't keep a seconds digit
+    /// honest, so the readout drops it rather than showing a stale one.
+    var watchSessionClockMinutes: String {
+        let total = Int(max(0, self))
+        return String(format: "%d:%02d", total / 3600, (total % 3600) / 60)
+    }
 }
 
 // MARK: - Wrist crash forensics (the 1069/1072 playbook, on the watch)
