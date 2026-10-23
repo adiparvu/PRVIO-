@@ -141,17 +141,23 @@ struct ShoppingLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .shopping, isComplete: done)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.shopping.title))
+                IslandCompactLeading(kind: .shopping, progress: progress,
+                                     tint: done ? .brandSuccess : LiveActivityKind.shopping.color,
+                                     value: countLabel) {
+                    IslandStateIcon(kind: .shopping, isComplete: done)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.shopping.title))
+                }
             } compactTrailing: {
-                if LA.island(.shopping) {
+                IslandCompactTrailing(kind: .shopping) {
                     IslandMetric(countText)
                         .accessibilityLabel(countLabel)
                 }
             } minimal: {
-                IslandStateIcon(kind: .shopping, isComplete: done)
-                    .accessibilityLabel(Text(LiveActivityKind.shopping.title))
+                IslandMinimal {
+                    IslandStateIcon(kind: .shopping, isComplete: done)
+                        .accessibilityLabel(Text(LiveActivityKind.shopping.title))
+                }
             }
         }
     }
@@ -281,17 +287,23 @@ struct MaintenanceLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .maintenance, isComplete: done)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.maintenance.title))
+                IslandCompactLeading(kind: .maintenance, progress: context.state.progress,
+                                     tint: done ? .brandSuccess : LiveActivityKind.maintenance.color,
+                                     value: percentText) {
+                    IslandStateIcon(kind: .maintenance, isComplete: done)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.maintenance.title))
+                }
             } compactTrailing: {
-                if LA.island(.maintenance) {
+                IslandCompactTrailing(kind: .maintenance) {
                     IslandMetric(percentText)
                         .accessibilityLabel(Text(context.state.stepDescription))
                 }
             } minimal: {
-                IslandStateIcon(kind: .maintenance, isComplete: done)
-                    .accessibilityLabel(Text(LiveActivityKind.maintenance.title))
+                IslandMinimal {
+                    IslandStateIcon(kind: .maintenance, isComplete: done)
+                        .accessibilityLabel(Text(LiveActivityKind.maintenance.title))
+                }
             }
         }
     }
@@ -409,17 +421,23 @@ struct WorkSessionLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .workSession, isComplete: done)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.workSession.title))
+                // A running timer can't fit 28pt; limited width keeps the glyph
+                // and moves the elapsed time to VoiceOver.
+                IslandCompactLeading(kind: .workSession, value: timer) {
+                    IslandStateIcon(kind: .workSession, isComplete: done)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.workSession.title))
+                }
             } compactTrailing: {
-                if LA.island(.workSession) {
+                IslandCompactTrailing(kind: .workSession) {
                     IslandMetric(timer, tint: done ? .brandSuccess : LiveActivityKind.workSession.color)
                         .frame(maxWidth: 44)
                 }
             } minimal: {
-                IslandStateIcon(kind: .workSession, isComplete: done)
-                    .accessibilityLabel(Text(LiveActivityKind.workSession.title))
+                IslandMinimal {
+                    IslandStateIcon(kind: .workSession, isComplete: done)
+                        .accessibilityLabel(Text(LiveActivityKind.workSession.title))
+                }
             }
         }
     }
@@ -655,11 +673,17 @@ struct DeliveryLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .delivery, isComplete: delivered, isProblem: problem, wiggles: enRoute)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.delivery.title))
+                // Limited width: the status word becomes the journey ring —
+                // the same four milestones the expanded bar segments.
+                IslandCompactLeading(kind: .delivery,
+                                     progress: Double(DeliveryFace.milestone(state) + 1) / 4,
+                                     tint: tint, value: Text(verbatim: label)) {
+                    IslandStateIcon(kind: .delivery, isComplete: delivered, isProblem: problem, wiggles: enRoute)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.delivery.title))
+                }
             } compactTrailing: {
-                if LA.island(.delivery) {
+                IslandCompactTrailing(kind: .delivery) {
                     Text(label)
                         .font(AppFont.label)
                         .foregroundStyle(tint)
@@ -667,8 +691,10 @@ struct DeliveryLiveActivity: Widget {
                         .contentTransition(.opacity)
                 }
             } minimal: {
-                IslandStateIcon(kind: .delivery, isComplete: delivered, isProblem: problem, wiggles: enRoute)
-                    .accessibilityLabel(Text(verbatim: label))
+                IslandMinimal {
+                    IslandStateIcon(kind: .delivery, isComplete: delivered, isProblem: problem, wiggles: enRoute)
+                        .accessibilityLabel(Text(verbatim: label))
+                }
             }
         }
     }
@@ -807,17 +833,23 @@ struct PlantCareLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .plantCare, isComplete: done, breathes: !done)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.plantCare.title))
+                IslandCompactLeading(kind: .plantCare, progress: progress,
+                                     tint: done ? .brandSuccess : LiveActivityKind.plantCare.color,
+                                     value: countLabel) {
+                    IslandStateIcon(kind: .plantCare, isComplete: done, breathes: !done)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.plantCare.title))
+                }
             } compactTrailing: {
-                if LA.island(.plantCare) {
+                IslandCompactTrailing(kind: .plantCare) {
                     IslandMetric(countText)
                         .accessibilityLabel(countLabel)
                 }
             } minimal: {
-                IslandStateIcon(kind: .plantCare, isComplete: done, breathes: !done)
-                    .accessibilityLabel(Text(LiveActivityKind.plantCare.title))
+                IslandMinimal {
+                    IslandStateIcon(kind: .plantCare, isComplete: done, breathes: !done)
+                        .accessibilityLabel(Text(LiveActivityKind.plantCare.title))
+                }
             }
         }
     }
@@ -945,17 +977,21 @@ struct EmergencyLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .emergency, pulses: true)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.emergency.title))
+                IslandCompactLeading(kind: .emergency, value: timer) {
+                    IslandStateIcon(kind: .emergency, pulses: true)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.emergency.title))
+                }
             } compactTrailing: {
-                if LA.island(.emergency) {
+                IslandCompactTrailing(kind: .emergency) {
                     IslandMetric(timer, tint: LiveActivityKind.emergency.color)
                         .frame(maxWidth: 44)
                 }
             } minimal: {
-                IslandStateIcon(kind: .emergency, pulses: true)
-                    .accessibilityLabel(Text(LiveActivityKind.emergency.title))
+                IslandMinimal {
+                    IslandStateIcon(kind: .emergency, pulses: true)
+                        .accessibilityLabel(Text(LiveActivityKind.emergency.title))
+                }
             }
         }
     }
@@ -1107,17 +1143,24 @@ struct IoTAlertLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                AlertSymbol(name: context.attributes.icon, tint: tint, pulses: active)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(context.attributes.sensorName))
+                // Free-form readings can't be promised to fit 28pt, so limited
+                // width keeps the tinted sensor glyph — its color already
+                // carries active / critical / resolved — and speaks the value.
+                IslandCompactLeading(kind: .iotAlert, value: Text(verbatim: context.state.valueDisplay)) {
+                    AlertSymbol(name: context.attributes.icon, tint: tint, pulses: active)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(context.attributes.sensorName))
+                }
             } compactTrailing: {
-                if LA.island(.iotAlert) {
+                IslandCompactTrailing(kind: .iotAlert) {
                     IslandMetric(Text(verbatim: context.state.valueDisplay), tint: tint)
                         .accessibilityLabel(Text(verbatim: "\(context.attributes.sensorName) \(context.state.valueDisplay)"))
                 }
             } minimal: {
-                AlertSymbol(name: context.attributes.icon, tint: tint, pulses: active)
-                    .accessibilityLabel(Text(context.attributes.sensorName))
+                IslandMinimal {
+                    AlertSymbol(name: context.attributes.icon, tint: tint, pulses: active)
+                        .accessibilityLabel(Text(context.attributes.sensorName))
+                }
             }
         }
     }
@@ -1284,16 +1327,20 @@ struct EnergyLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                IslandStateIcon(kind: .energy)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(LiveActivityKind.energy.title))
+                IslandCompactLeading(kind: .energy, value: Text(verbatim: headline)) {
+                    IslandStateIcon(kind: .energy)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(LiveActivityKind.energy.title))
+                }
             } compactTrailing: {
-                if LA.island(.energy) {
+                IslandCompactTrailing(kind: .energy) {
                     IslandMetric(Text(verbatim: headline), tint: LiveActivityKind.energy.color)
                 }
             } minimal: {
-                IslandStateIcon(kind: .energy)
-                    .accessibilityLabel(Text(LiveActivityKind.energy.title))
+                IslandMinimal {
+                    IslandStateIcon(kind: .energy)
+                        .accessibilityLabel(Text(LiveActivityKind.energy.title))
+                }
             }
         }
     }
@@ -1487,11 +1534,15 @@ struct CoverLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                CoverSymbol(stage: stage, tint: tint)
-                    .font(AppFont.captionStrong)
-                    .accessibilityLabel(Text(context.attributes.deviceName))
+                // The symbol and tint already change per stage, so limited
+                // width drops only the stage word (VoiceOver still reads it).
+                IslandCompactLeading(kind: .cover, value: Text(CoverFace.label(stage))) {
+                    CoverSymbol(stage: stage, tint: tint)
+                        .font(AppFont.captionStrong)
+                        .accessibilityLabel(Text(context.attributes.deviceName))
+                }
             } compactTrailing: {
-                if LA.island(.cover) {
+                IslandCompactTrailing(kind: .cover) {
                     Text(CoverFace.label(stage))
                         .font(AppFont.label)
                         .foregroundStyle(tint)
@@ -1499,8 +1550,10 @@ struct CoverLiveActivity: Widget {
                         .contentTransition(.opacity)
                 }
             } minimal: {
-                CoverSymbol(stage: stage, tint: tint)
-                    .accessibilityLabel(Text(context.attributes.deviceName))
+                IslandMinimal {
+                    CoverSymbol(stage: stage, tint: tint)
+                        .accessibilityLabel(Text(context.attributes.deviceName))
+                }
             }
         }
     }

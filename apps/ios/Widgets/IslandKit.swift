@@ -29,6 +29,12 @@ enum LA {
 enum IslandMetrics {
     /// Lock-screen leading icon disc.
     static let iconDisc: CGFloat = 44
+    /// HIG: compact and minimal presentations must fit a 28pt-diameter circle
+    /// wherever the Dynamic Island is limited in width (landscape iPhone).
+    static let limitedWidthCircle: CGFloat = 28
+    /// Progress ring stroke inside that circle — thin enough to leave the
+    /// glyph its full caption size within the remaining ~23pt.
+    static let limitedWidthRing: CGFloat = 2.5
 }
 
 // MARK: - State icon
@@ -202,6 +208,122 @@ struct IslandMilestoneBar: View {
     private func segmentColor(_ i: Int) -> Color {
         guard i <= stage else { return Color.primary.opacity(AppOpacity.subtleFill) }
         return (isProblem && i == stage) ? .brandWarning : tint
+    }
+}
+
+// MARK: - Limited-width Dynamic Island
+//
+// iOS 27 shows compact and minimal presentations in landscape too, where they
+// cannot grow in width. Per the HIG, each activity then keeps a leading view
+// only — one glyph that fits a 28pt circle, ringed with progress where the
+// activity has one — and the trailing view goes empty so the system hides it.
+// Outside that context, and below iOS 27, every wrapper renders its content
+// untouched. The environment value is iOS 27-only and the widget extension
+// floors at iOS 18, so the reader lives in an availability-gated view.
+
+@available(iOS 27.0, *)
+private struct LimitedWidthSwitch<Full: View, Limited: View>: View {
+    @Environment(\.isDynamicIslandLimitedInWidth) private var isLimited
+    @ViewBuilder var full: Full
+    @ViewBuilder var limited: Limited
+
+    var body: some View {
+        if isLimited { limited } else { full }
+    }
+}
+
+/// `full` normally; `limited` when the Dynamic Island is limited in width.
+private struct IslandLimitedWidth<Full: View, Limited: View>: View {
+    @ViewBuilder var full: Full
+    @ViewBuilder var limited: Limited
+
+    var body: some View {
+        if #available(iOS 27.0, *) {
+            LimitedWidthSwitch { full } limited: { limited }
+        } else {
+            full
+        }
+    }
+}
+
+/// Circular progress around the limited-width glyph — the graphic stand-in
+/// for the count/percentage the hidden trailing view would have shown.
+struct IslandProgressRing: View {
+    let value: Double
+    let tint: Color
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(tint.opacity(AppOpacity.tintedFill), lineWidth: IslandMetrics.limitedWidthRing)
+            Circle()
+                .trim(from: 0, to: max(0, min(1, value)))
+                .stroke(tint, style: StrokeStyle(lineWidth: IslandMetrics.limitedWidthRing, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+        }
+        // Strokes straddle the path; inset by half so the ring stays inside 28pt.
+        .padding(IslandMetrics.limitedWidthRing / 2)
+        .animation(.smooth, value: value)
+        .accessibilityHidden(true) // the glyph's accessibility value states it
+    }
+}
+
+/// compactLeading. When limited: the same glyph inside the 28pt circle, an
+/// optional progress ring, and `value` read by VoiceOver in place of the
+/// hidden trailing metric. Ring and value follow the user's island-data gate,
+/// exactly like the trailing view they replace.
+struct IslandCompactLeading<Content: View>: View {
+    let kind: LiveActivityKind
+    var progress: Double? = nil
+    var tint: Color? = nil
+    var value: Text? = nil
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        IslandLimitedWidth {
+            content
+        } limited: {
+            ZStack {
+                if LA.island(kind), let progress {
+                    IslandProgressRing(value: progress, tint: tint ?? kind.color)
+                }
+                if LA.island(kind), let value {
+                    content.accessibilityValue(value)
+                } else {
+                    content
+                }
+            }
+            .frame(width: IslandMetrics.limitedWidthCircle, height: IslandMetrics.limitedWidthCircle)
+        }
+    }
+}
+
+/// compactTrailing. Owns the user's island-data gate and goes empty when
+/// limited in width, so the system hides the trailing side entirely.
+struct IslandCompactTrailing<Content: View>: View {
+    let kind: LiveActivityKind
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        if LA.island(kind) {
+            IslandLimitedWidth { content } limited: { EmptyView() }
+        }
+    }
+}
+
+/// minimal. Already a single glyph; when limited it is pinned to the 28pt
+/// circle so a wide symbol can never spill past it.
+struct IslandMinimal<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        IslandLimitedWidth {
+            content
+        } limited: {
+            content
+                .frame(maxWidth: IslandMetrics.limitedWidthCircle,
+                       maxHeight: IslandMetrics.limitedWidthCircle)
+        }
     }
 }
 
