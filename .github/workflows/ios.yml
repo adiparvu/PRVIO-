@@ -23,7 +23,7 @@ jobs:
     # filter above requires touching apps/ios/** or this file. A retry must
     # carry a real change to one of those paths.
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy]')
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
 
     defaults:
@@ -44,6 +44,15 @@ jobs:
 
       - name: Install XcodeGen
         run: brew install xcodegen
+
+      # Current cycle toolchain (WWDC26 → iOS/watchOS 27 SDKs). The
+      # `macos-26` image tops out at Xcode 26.6 (26.5 SDKs); the `xcode-27`
+      # image carries 27.x. `Xcode_27.1.app` is the image's stable symlink
+      # (the folder behind it moves from RC to final); 27.0 is the fallback.
+      - name: Select Xcode 27
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1.app || sudo xcode-select -s /Applications/Xcode_27.app
+          xcodebuild -version
 
       - name: Install iOS platform
         run: |
@@ -101,7 +110,7 @@ jobs:
 
   test:
     name: Unit Tests
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 35
 
     defaults:
@@ -113,6 +122,15 @@ jobs:
 
       - name: Install XcodeGen
         run: brew install xcodegen
+
+      # Current cycle toolchain (WWDC26 → iOS/watchOS 27 SDKs). The
+      # `macos-26` image tops out at Xcode 26.6 (26.5 SDKs); the `xcode-27`
+      # image carries 27.x. `Xcode_27.1.app` is the image's stable symlink
+      # (the folder behind it moves from RC to final); 27.0 is the fallback.
+      - name: Select Xcode 27
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1.app || sudo xcode-select -s /Applications/Xcode_27.app
+          xcodebuild -version
 
       - name: Install iOS platform
         run: |

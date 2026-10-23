@@ -4,7 +4,7 @@ options:
   deploymentTarget:
     iOS: "17.1"
     watchOS: "10.0"
-  xcodeVersion: "26.0"
+  xcodeVersion: "27.1"
   swift: "5.10"
   createIntermediateGroups: true
   developmentLanguage: ro
