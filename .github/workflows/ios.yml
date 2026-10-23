@@ -2,7 +2,7 @@ name: iOS — TestFlight Deploy
 
 on:
   push:
-    branches: [main, claude/prv-house-vision-bjnc7z, claude/prv-house-vision-rh9ezh]
+    branches: [main, claude/prv-house-vision-bjnc7z, claude/prv-house-vision-rh9ezh, claude/session-inquiry-2oqlz0]
     paths:
       - 'apps/ios/**'
       - '.github/workflows/ios.yml'
