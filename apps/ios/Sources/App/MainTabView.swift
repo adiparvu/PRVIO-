@@ -67,7 +67,7 @@ struct MainTabView: View {
 
     var body: some View {
         @Bindable var router = router
-        let visibleTabs = AppTab.visible(for: propertyService.myRole)
+        let visibleTabs = router.visibleTabs
         return TabView(selection: $router.selectedTab) {
             if visibleTabs.contains(.home) {
                 // Family sees the household dashboard; outsiders (tenant) get
@@ -237,6 +237,9 @@ struct MainTabView: View {
                 try? await Task.sleep(nanoseconds: 45_000_000_000)
             }
         }
+        // A role changed by another member mid-session (realtime) re-trims
+        // the bar through the same clamped path as startup.
+        .onChange(of: propertyService.myRole) { _, _ in redirectIfTabHidden() }
         .onChange(of: scenePhase) { _, phase in
             // Beat immediately on foreground so we don't read as offline after a
             // background gap; drop the live channel while backgrounded.
@@ -609,10 +612,11 @@ struct MainTabView: View {
         ProactiveEngine.cacheForBackground(appliances: applianceService.appliances, elements: elementService.elements)
     }
 
+    /// Publishes the role's tab set to the router — the bar and the selection
+    /// (clamped by the router) change together, never one frame apart.
     private func redirectIfTabHidden() {
-        if !AppTab.visible(for: propertyService.myRole).contains(router.selectedTab) {
-            router.selectedTab = .chat
-        }
+        let visible = AppTab.visible(for: propertyService.myRole)
+        if router.visibleTabs != visible { router.visibleTabs = visible }
     }
 
     /// One presence beat: stamp our own heartbeat, then refresh the property's

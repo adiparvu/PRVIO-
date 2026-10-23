@@ -4,7 +4,23 @@ import Observation
 @MainActor
 @Observable
 final class AppRouter {
-    var selectedTab: AppTab = .home
+    /// The tabs the tab bar currently shows. The TabView builds from THIS set
+    /// (not from the role directly), so the bar and the selection always
+    /// change in the same mutation.
+    var visibleTabs: Set<AppTab> = Set(AppTab.allCases) {
+        didSet { if !visibleTabs.contains(selectedTab) { selectedTab = fallbackTab } }
+    }
+
+    /// Clamped to `visibleTabs`: on the iOS 27 SDK a TabView whose selection
+    /// names a hidden tab may crash, and deep links (widgets, quick actions,
+    /// notifications) can ask a guest for a tab their role doesn't have.
+    var selectedTab: AppTab = .home {
+        didSet { if !visibleTabs.contains(selectedTab) { selectedTab = fallbackTab } }
+    }
+
+    private var fallbackTab: AppTab {
+        visibleTabs.contains(.chat) ? .chat : (AppTab.allCases.first(where: visibleTabs.contains) ?? .chat)
+    }
 
     // MARK: - Routed presentations
     //
