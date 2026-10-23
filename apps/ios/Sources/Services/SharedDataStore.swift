@@ -950,6 +950,17 @@ enum SharedDataStore {
     /// The watch payload assembled from the store alone — used to answer a
     /// wrist action instantly (after the local mutations) without needing the
     /// app's services to be alive.
+    static let watchTaskLimit = 60
+    static let watchListLimit = 40
+
+    /// Open entries first (in catalog order), then the most recent closed
+    /// ones, capped — the watch shows what's actionable.
+    static func watchSlice<T>(_ items: [T], isOpen: (T) -> Bool, limit: Int) -> [T] {
+        let open = items.filter(isOpen)
+        let closed = items.filter { !isOpen($0) }
+        return Array((open + closed).prefix(limit))
+    }
+
     static func currentWatchPayload() -> WatchPayload? {
         guard let snapshot = read() else { return nil }
         let extras = readWatchExtras()
@@ -957,9 +968,17 @@ enum SharedDataStore {
         return WatchPayload(snapshot: snapshot,
                             accountId: stamp.userId,
                             isFamilyScope: stamp.isFamily,
-                            tasks: readTaskCatalog(),
-                            plants: readPlantCatalog(),
-                            supplies: readSupplyCatalog(),
+                            // Bounded for the wrist: WatchConnectivity rejects an
+                            // oversized applicationContext outright, and the full
+                            // catalogs (up to 500 tasks, every supply ever bought)
+                            // grew past it — the push failed and the watch sat on
+                            // stale or no data. Open items lead; widgets and
+                            // intents keep reading the full catalogs.
+                            tasks: watchSlice(readTaskCatalog(), isOpen: { !$0.isCompleted },
+                                              limit: watchTaskLimit),
+                            plants: Array(readPlantCatalog().prefix(watchListLimit)),
+                            supplies: watchSlice(readSupplyCatalog(), isOpen: { !$0.isCompleted },
+                                                 limit: watchListLimit),
                             deliveries: readDeliveryCatalog(),
                             pantry: readPantryCatalog(),
                             latitude: extras.latitude,

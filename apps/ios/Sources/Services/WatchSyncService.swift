@@ -70,7 +70,11 @@ final class WatchSyncService: NSObject, WCSessionDelegate {
             try session.updateApplicationContext(["payload": data])
             UserDefaults(suiteName: SharedDataStore.suiteName)?
                 .set(Date().timeIntervalSince1970, forKey: Self.lastPushKey)
-        } catch {}
+        } catch {
+            // Never silent again: an oversized or rejected context left the
+            // wrist on stale data with no trace anywhere.
+            debugLog("Watch push failed (\(data.count) bytes):", error)
+        }
     }
 
     /// Push a signed-out marker (empty snapshot, `accountId == nil`) so the watch
