@@ -1,3 +1,4 @@
+import AppIntents
 import Foundation
 import CoreSpotlight
 
@@ -21,6 +22,16 @@ final class SpotlightService {
             let priorityLabel = task.priority == "high" ? String(localized: "High") : task.priority == "medium" ? String(localized: "Medium") : String(localized: "Low")
             attrs.contentDescription = "\(priorityLabel) · \(task.dueDateDisplay)"
             attrs.keywords = [task.title, task.category, task.priority]
+            // Attaching the entity to the existing item (instead of indexing it
+            // a second time) lets Siri and the semantic index act on this task
+            // without creating a duplicate Spotlight entry.
+            if #available(iOS 18.0, *) {
+                let weight = task.priority == "high" ? 2 : task.priority == "medium" ? 1 : 0
+                attrs.associateAppEntity(
+                    TaskEntity(id: task.id, title: task.title, priority: task.priority),
+                    priority: weight
+                )
+            }
             let item = CSSearchableItem(
                 uniqueIdentifier: "task-\(task.id.uuidString)",
                 domainIdentifier: "com.prvio.tasks",
@@ -39,6 +50,12 @@ final class SpotlightService {
             if plant.needsWatering { descParts.append(String(localized: "Needs watering")) }
             attrs.contentDescription = descParts.isEmpty ? String(localized: "Plant") : descParts.joined(separator: " · ")
             attrs.keywords = ([plant.name] + [plant.species, plant.location].compactMap { $0 }).filter { !$0.isEmpty }
+            if #available(iOS 18.0, *) {
+                attrs.associateAppEntity(
+                    PlantEntity(id: plant.id, name: plant.name, emoji: plant.emoji),
+                    priority: plant.needsWatering ? 1 : 0
+                )
+            }
             let item = CSSearchableItem(
                 uniqueIdentifier: "plant-\(plant.id.uuidString)",
                 domainIdentifier: "com.prvio.plants",
