@@ -131,6 +131,11 @@ struct WatchPayload: Codable {
     /// renders. nil = no fresh sky; the mood wash stays the honest fallback.
     var skyTop: [Double]? = nil
     var skyBottom: [Double]? = nil
+    /// The day's one-sentence brief ("Two things today: …"), composed on
+    /// the phone by HouseBriefService and already localized. Family scope
+    /// only; nil (outsider, older phone build, not yet composed) lets the
+    /// wrist fall back to its own summary — the watch never waits for it.
+    var briefHeadline: String? = nil
 }
 
 // MARK: Tolerant decoding
@@ -150,7 +155,7 @@ extension WatchPayload {
         case weatherTemp, weatherSymbol, weatherLo, weatherHi, weatherAdvisory
         case streakDays, budgetSpent, budgetLimit, budgetCurrency, pageOrder
         case sensors, actuators, emergencyContacts, emergencySteps, dmConversations
-        case mood, skyTop, skyBottom
+        case mood, skyTop, skyBottom, briefHeadline
     }
 
     init(from decoder: Decoder) throws {
@@ -185,6 +190,7 @@ extension WatchPayload {
         mood              = try c.decodeIfPresent(String.self,                forKey: .mood)
         skyTop            = try c.decodeIfPresent([Double].self,              forKey: .skyTop)
         skyBottom         = try c.decodeIfPresent([Double].self,              forKey: .skyBottom)
+        briefHeadline     = try c.decodeIfPresent(String.self,                forKey: .briefHeadline)
     }
 }
 
@@ -1013,7 +1019,38 @@ enum SharedDataStore {
                             // static choice stays honest until changed); the
                             // weather sky remains only as the legacy fallback.
                             skyTop: (readBackdropSky() ?? freshWeatherSky())?.top,
-                            skyBottom: (readBackdropSky() ?? freshWeatherSky())?.bottom)
+                            skyBottom: (readBackdropSky() ?? freshWeatherSky())?.bottom,
+                            // The day's brief summarizes the family's tasks,
+                            // plants, parcels and shopping — family scope only.
+                            briefHeadline: stamp.isFamily ? readBriefHeadline() : nil)
+    }
+
+    // MARK: The day's brief (composed by HouseBriefService on the phone)
+
+    static let briefHeadlineKey = "prvio.watch.briefHeadline"
+    /// The account the stored brief was composed for. A brief describes one
+    /// household, so it is only ever read back under the same account stamp —
+    /// a switched or signed-out account never inherits the previous owner's.
+    private static let briefOwnerKey = "prvio.watch.briefOwner"
+
+    static func writeBriefHeadline(_ headline: String?, ownerId: String?) {
+        guard let ud = UserDefaults(suiteName: suiteName) else { return }
+        if let headline, !headline.isEmpty, let ownerId {
+            ud.set(headline, forKey: briefHeadlineKey)
+            ud.set(ownerId, forKey: briefOwnerKey)
+        } else {
+            ud.removeObject(forKey: briefHeadlineKey)
+            ud.removeObject(forKey: briefOwnerKey)
+        }
+    }
+
+    static func readBriefHeadline() -> String? {
+        guard let ud = UserDefaults(suiteName: suiteName),
+              let headline = ud.string(forKey: briefHeadlineKey),
+              !headline.isEmpty,
+              let owner = ud.string(forKey: briefOwnerKey),
+              owner == readAccountStamp().userId else { return nil }
+        return headline
     }
 
     // MARK: Watch page personalization (chosen on the iPhone)

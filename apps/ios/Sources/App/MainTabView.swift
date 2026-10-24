@@ -762,6 +762,21 @@ struct MainTabView: View {
         if let payload = SharedDataStore.currentWatchPayload() {
             WatchSyncService.shared.push(payload)
         }
+        // The day's brief: composed off this path (the push above carries the
+        // previous one); a new sentence re-pushes the payload once.
+        if family {
+            let previousBrief = SharedDataStore.readBriefHeadline()
+            Task { [tasks = taskService.tasks, plants = plantService.plantsNeedingWater,
+                    deliveries = deliveryService.activeDeliveries, supplies = supplyService.items,
+                    name = propertyService.primary?.name] in
+                let brief = await HouseBriefService.shared.refresh(
+                    tasks: tasks, plants: plants, deliveries: deliveries,
+                    supplies: supplies, propertyName: name)
+                if brief != previousBrief, let payload = SharedDataStore.currentWatchPayload() {
+                    WatchSyncService.shared.push(payload)
+                }
+            }
+        }
         WidgetCenter.shared.reloadAllTimelines()
     }
 
