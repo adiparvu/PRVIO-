@@ -297,7 +297,7 @@
     "meter_add_photo": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Photo of the dial (optional)"}}, "ro": {"stringUnit": {"state": "translated", "value": "Poză cu cadranul (opțional)"}}}},
     "meter_photo_attached": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Photo attached"}}, "ro": {"stringUnit": {"state": "translated", "value": "Poză atașată"}}}},
     "Check off next item": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Check off next item"}}, "ro": {"stringUnit": {"state": "translated", "value": "Bifează următorul articol"}}}},
-    "Complete Task": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Complete Task"}}, "ro": {"stringUnit": {"state": "translated", "value": "Finalizează sarcina"}}}},
+    "Complete Task": {"localizations" : {"en" : {"stringUnit" : {"state" : "translated", "value" : "Complete Task"}}, "ro" : {"stringUnit" : {"state" : "translated", "value" : "Finalizează sarcina"}}, "fr" : {"stringUnit" : {"state" : "translated", "value" : "Terminer la tâche"}}, "nl" : {"stringUnit" : {"state" : "translated", "value" : "Taak voltooien"}}, "de" : {"stringUnit" : {"state" : "translated", "value" : "Aufgabe erledigen"}}}},
     "Complete maintenance task": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Complete maintenance task"}}, "ro": {"stringUnit": {"state": "translated", "value": "Finalizează sarcina de întreținere"}}}},
     "End Session": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "End Session"}}, "ro": {"stringUnit": {"state": "translated", "value": "Încheie sesiunea"}}}},
     "Log expense": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Log expense"}}, "ro": {"stringUnit": {"state": "translated", "value": "Înregistrează cheltuială"}}}},
@@ -9304,6 +9304,24 @@
             "state": "translated",
             "value": "Anulează"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuleren"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
         }
       }
     },
@@ -12268,6 +12286,24 @@
             "state": "translated",
             "value": "Curier"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transporteur"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervoerder"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paketdienst"
+          }
         }
       }
     },
@@ -13613,6 +13649,24 @@
             "state": "translated",
             "value": "Livrat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Livré"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bezorgd"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zugestellt"
+          }
         }
       }
     },
@@ -14781,6 +14835,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Estimat: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrivée : %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwacht: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ankunft: %@"
           }
         }
       }
@@ -16608,6 +16680,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Așteptat"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prévu"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwacht"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erwartet"
           }
         }
       }
@@ -19537,6 +19627,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Scor de sănătate"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Score de santé"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gezondheidsscore"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zustandswert"
           }
         }
       }
@@ -24936,6 +25044,24 @@
             "state": "translated",
             "value": "Ratat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manqué"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gemist"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verpasst"
+          }
         }
       }
     },
@@ -25736,6 +25862,24 @@
             "state": "translated",
             "value": "Necesită apă"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À arroser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heeft water nodig"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Braucht Wasser"
+          }
         }
       }
     },
@@ -25944,6 +26088,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sarcină nouă"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouvelle tâche"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nieuwe taak"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Aufgabe"
           }
         }
       }
@@ -29260,6 +29422,24 @@
             "state": "translated",
             "value": "În livrare"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En livraison"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wordt bezorgd"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Zustellung"
+          }
         }
       }
     },
@@ -30846,6 +31026,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Plantă"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plante"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plant"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pflanze"
           }
         }
       }
@@ -33903,6 +34101,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Returnat"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retourné"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geretourneerd"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurückgeschickt"
           }
         }
       }
@@ -38902,6 +39118,24 @@
             "state": "translated",
             "value": "Sarcină"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tâche"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taak"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufgabe"
+          }
         }
       }
     },
@@ -43594,6 +43828,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sesiune de lucru"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session de travail"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Werksessie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeitssitzung"
           }
         }
       }
@@ -52107,6 +52359,24 @@
             "state": "translated",
             "value": "Adresa proprietății: %1$@, %2$@. Atinge ca să o copiezi."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresse de la propriété : %1$@, %2$@. Touchez pour copier."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adres van de woning: %1$@, %2$@. Tik om te kopiëren."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresse des Grundstücks: %1$@, %2$@. Tippe zum Kopieren."
+          }
         }
       }
     },
@@ -52122,6 +52392,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copiat"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copié"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gekopieerd"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopiert"
           }
         }
       }
@@ -52139,6 +52427,24 @@
             "state": "translated",
             "value": "Atinge ca să copiezi adresa"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez pour copier l’adresse"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik om het adres te kopiëren"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe, um die Adresse zu kopieren"
+          }
         }
       }
     },
@@ -52154,6 +52460,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atinge ca să trimiți din nou"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez pour renvoyer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik om opnieuw te sturen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe, um erneut zu senden"
           }
         }
       }
@@ -52171,6 +52495,24 @@
             "state": "translated",
             "value": "Se trimite instant în chatul familiei: „⚠️ Urgență la %@ — sunați-mă!\""
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoie aussitôt dans le chat familial : « ⚠️ Urgence à %@ — appelez-moi ! »"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wordt direct naar de familiechat gestuurd: ‘⚠️ Noodgeval bij %@ — bel me!’"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird sofort in den Familienchat gesendet: „⚠️ Notfall bei %@ — ruf mich an!“"
+          }
         }
       }
     },
@@ -52186,6 +52528,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trimite alerta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer l’alerte"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alarm versturen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alarm senden"
           }
         }
       }
@@ -52203,6 +52563,24 @@
             "state": "translated",
             "value": "Alertezi familia?"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerter la famille ?"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Familie waarschuwen?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Familie alarmieren?"
+          }
         }
       }
     },
@@ -52218,6 +52596,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trimiterea a eșuat — încearcă din nou"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de l’envoi — réessayez"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versturen mislukt — probeer het opnieuw"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senden fehlgeschlagen — versuch es noch mal"
           }
         }
       }
@@ -52235,6 +52631,24 @@
             "state": "translated",
             "value": "Alertează familia"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerter la famille"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Familie waarschuwen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Familie alarmieren"
+          }
         }
       }
     },
@@ -52250,6 +52664,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un mesaj instant în chatul familiei"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un message instantané au chat familial"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eén direct bericht naar de familiechat"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Sofortnachricht an den Familienchat"
           }
         }
       }
@@ -52267,6 +52699,24 @@
             "state": "translated",
             "value": "⚠️ Urgență la %@ — sunați-mă!"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Urgence à %@ — appelez-moi !"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Noodgeval bij %@ — bel me!"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Notfall bei %@ — ruf mich an!"
+          }
         }
       }
     },
@@ -52282,6 +52732,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Se trimite…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoi…"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versturen…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird gesendet…"
           }
         }
       }
@@ -52299,6 +52767,24 @@
             "state": "translated",
             "value": "Familia a fost alertată ✓"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La famille a été alertée ✓"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De familie is gewaarschuwd ✓"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Familie wurde alarmiert ✓"
+          }
         }
       }
     },
@@ -52314,6 +52800,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Numărul apelat de cardul „Urgență gaz\" pentru această proprietate. Gol = revine la 0800-001122 (România)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le numéro qu’appelle la carte « Urgence gaz » pour cette propriété. Laissez vide pour revenir au 0800-001122 (Roumanie)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het nummer dat de kaart ‘Gasnoodgeval’ voor deze woning belt. Laat leeg om terug te gaan naar 0800-001122 (Roemenië)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Nummer, die die Karte „Gasnotfall“ für dieses Grundstück wählt. Leer lassen, um auf 0800-001122 (Rumänien) zurückzusetzen."
           }
         }
       }
@@ -52331,6 +52835,24 @@
             "state": "translated",
             "value": "Număr de telefon"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Numéro de téléphone"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoonnummer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonnummer"
+          }
         }
       }
     },
@@ -52346,6 +52868,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Număr urgență gaz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Numéro d’urgence gaz"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noodnummer gas"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gasnotrufnummer"
           }
         }
       }
@@ -52363,6 +52903,24 @@
             "state": "translated",
             "value": "Ghid orientativ, nu înlocuiește serviciile de urgență. Într-un pericol imediat, sună întâi la 112."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un guide général, qui ne remplace pas les services d’urgence. En cas de danger immédiat, appelez d’abord le 112."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een algemene gids, geen vervanging voor de hulpdiensten. Bij direct gevaar bel je eerst 112."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein allgemeiner Leitfaden, kein Ersatz für den Notdienst. Bei akuter Gefahr ruf zuerst die 112 an."
+          }
         }
       }
     },
@@ -52378,6 +52936,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Scoate imediat pe toată lumea din casă. Nu te opri după lucruri."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faites sortir tout le monde immédiatement. Ne vous arrêtez pas pour vos affaires."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haal iedereen meteen het huis uit. Blijf niet staan voor spullen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring sofort alle aus dem Haus. Halte nicht für Sachen an."
           }
         }
       }
@@ -52395,6 +52971,24 @@
             "state": "translated",
             "value": "Sună la 112 imediat ce ești în siguranță."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appelez le 112 dès que vous êtes en sécurité."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bel 112 zodra je in veiligheid bent."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruf die 112 an, sobald du in Sicherheit bist."
+          }
         }
       }
     },
@@ -52410,6 +53004,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atinge ușile cu dosul palmei înainte să le deschizi — dacă sunt fierbinți, nu le deschide."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez les portes du dos de la main avant d’ouvrir — si une porte est chaude, ne l’ouvrez pas."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voel met de rug van je hand aan deuren voor je ze opent — is een deur heet, open hem dan niet."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berühre Türen mit dem Handrücken, bevor du sie öffnest — ist eine Tür heiß, öffne sie nicht."
           }
         }
       }
@@ -52427,6 +53039,24 @@
             "state": "translated",
             "value": "Dacă e fum, mergi aplecat, aproape de podea. Nu folosi liftul."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "S’il y a de la fumée, restez bas, près du sol. N’utilisez pas l’ascenseur."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is er rook, blijf dan laag, dicht bij de vloer. Neem niet de lift."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei Rauch bleib unten, nah am Boden. Nimm nicht den Aufzug."
+          }
         }
       }
     },
@@ -52442,6 +53072,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stinge singur doar un foc mic și doar dacă ai o ieșire liberă în spate."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "N’éteignez vous-même qu’un petit feu, et seulement avec une sortie dégagée derrière vous."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blus alleen zelf een klein vuur, en alleen met een vrije uitgang achter je."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lösche nur ein kleines Feuer selbst, und nur mit einem freien Ausgang hinter dir."
           }
         }
       }
@@ -52459,6 +53107,24 @@
             "state": "translated",
             "value": "Incendiu"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incendie"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brand"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brand"
+          }
         }
       }
     },
@@ -52474,6 +53140,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Închide robinetul general de apă."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermez le robinet d’arrivée d’eau principal."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Draai de hoofdkraan van het water dicht."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dreh den Hauptwasserhahn zu."
           }
         }
       }
@@ -52491,6 +53175,24 @@
             "state": "translated",
             "value": "Oprește curentul de la tabloul electric dacă apa se apropie de prize sau de cabluri."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coupez le courant au tableau électrique si l’eau approche des prises ou des câbles."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet de stroom uit in de meterkast als het water bij stopcontacten of kabels komt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schalte den Strom am Sicherungskasten ab, wenn Wasser in die Nähe von Steckdosen oder Kabeln kommt."
+          }
         }
       }
     },
@@ -52506,6 +53208,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mută obiectele de valoare și documentele mai sus, departe de apă."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mettez les objets de valeur et les documents en hauteur, loin de l’eau."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet waardevolle spullen en documenten hoger, weg van het water."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring Wertsachen und Dokumente nach oben, weg vom Wasser."
           }
         }
       }
@@ -52523,6 +53243,24 @@
             "state": "translated",
             "value": "Fotografiază pagubele pentru asigurare înainte să faci curățenie."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photographiez les dégâts pour l’assurance avant de nettoyer."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotografeer de schade voor de verzekering voordat je opruimt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotografiere den Schaden für die Versicherung, bevor du aufräumst."
+          }
         }
       }
     },
@@ -52538,6 +53276,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dacă apa vine de la vecini sau din instalația comună, anunță asociația și un instalator."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si l’eau vient des voisins ou d’une conduite commune, prévenez le syndic et un plombier."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komt het water van de buren of een gedeelde leiding, laat het dan de VvE en een loodgieter weten."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kommt das Wasser von den Nachbarn oder einer gemeinsamen Leitung, sag der Hausverwaltung und einem Installateur Bescheid."
           }
         }
       }
@@ -52555,6 +53311,24 @@
             "state": "translated",
             "value": "Inundație"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inondation"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overstroming"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überschwemmung"
+          }
         }
       }
     },
@@ -52570,6 +53344,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Robinetul general — locul salvat de tine"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Robinet d’eau principal — votre lieu enregistré"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoofdkraan — je opgeslagen plek"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hauptwasserhahn — dein gespeicherter Ort"
           }
         }
       }
@@ -52587,6 +53379,24 @@
             "state": "translated",
             "value": "NU aprinde lumina, nu folosi întrerupătoare, prize sau flacără deschisă."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "N’allumez PAS la lumière, ne touchez ni interrupteurs, ni prises, ni flamme nue."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doe GEEN licht aan, gebruik geen schakelaars, stopcontacten of open vuur."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schalte KEIN Licht ein, benutze keine Schalter, Steckdosen oder offenes Feuer."
+          }
         }
       }
     },
@@ -52602,6 +53412,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deschide larg ferestrele și ușile."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez grand les fenêtres et les portes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet ramen en deuren wijd open."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne Fenster und Türen weit."
           }
         }
       }
@@ -52619,6 +53447,24 @@
             "state": "translated",
             "value": "Închide robinetul de gaz."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermez le robinet de gaz."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Draai de gaskraan dicht."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dreh den Gashahn zu."
+          }
         }
       }
     },
@@ -52634,6 +53480,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Scoate pe toată lumea din casă."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faites sortir tout le monde de la maison."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haal iedereen het huis uit."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring alle aus dem Haus."
           }
         }
       }
@@ -52651,6 +53515,24 @@
             "state": "translated",
             "value": "Sună la urgența de gaz de afară, de la distanță de casă."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appelez l’urgence gaz depuis l’extérieur, loin de la maison."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bel het gasnoodnummer van buiten, uit de buurt van het huis."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruf den Gasnotdienst von draußen an, mit Abstand zum Haus."
+          }
         }
       }
     },
@@ -52666,6 +53548,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Scurgere de gaz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuite de gaz"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gaslek"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gasleck"
           }
         }
       }
@@ -52683,6 +53583,24 @@
             "state": "translated",
             "value": "Verifică tabloul electric — o siguranță căzută se ridică la loc."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifiez le tableau électrique — remontez le disjoncteur qui a sauté."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kijk in de meterkast — zet een gesprongen groep weer omhoog."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prüfe den Sicherungskasten — eine ausgelöste Sicherung kippst du wieder hoch."
+          }
         }
       }
     },
@@ -52698,6 +53616,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uită-te afară: dacă și vecinii sunt în beznă, e o avarie de rețea — anunță furnizorul."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regardez dehors : si les voisins sont aussi dans le noir, c’est une panne de réseau — signalez-la à votre fournisseur."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kijk naar buiten: zitten de buren ook in het donker, dan is het een netstoring — meld het bij je netbeheerder."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schau nach draußen: Sind die Nachbarn auch im Dunkeln, ist es ein Netzausfall — melde ihn deinem Anbieter."
           }
         }
       }
@@ -52715,6 +53651,24 @@
             "state": "translated",
             "value": "Scoate din priză aparatele sensibile, ca revenirea curentului să nu le strice."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Débranchez les appareils sensibles pour que la surtension au retour du courant ne les abîme pas."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haal gevoelige apparaten uit het stopcontact, zodat de piek bij terugkeer van de stroom ze niet beschadigt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zieh empfindliche Geräte aus der Steckdose, damit die Spannungsspitze bei Stromrückkehr sie nicht beschädigt."
+          }
         }
       }
     },
@@ -52730,6 +53684,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ține ușile frigiderului și congelatorului închise — păstrează frigul câteva ore."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardez le frigo et le congélateur fermés — ils restent froids pendant des heures."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Houd koelkast en vriezer dicht — die blijven urenlang koud."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lass Kühlschrank und Gefrierschrank zu — sie halten die Kälte stundenlang."
           }
         }
       }
@@ -52747,6 +53719,24 @@
             "state": "translated",
             "value": "Pană de curent"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coupure de courant"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroomstoring"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stromausfall"
+          }
         }
       }
     },
@@ -52762,6 +53752,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ce fac dacă…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Que faire si…"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat doe ik als…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was tun bei…"
           }
         }
       }
@@ -52779,6 +53787,24 @@
             "state": "translated",
             "value": "%@ — atinge ca să vezi fotografia"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — touchez pour voir la photo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — tik om de foto te bekijken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — tippe, um das Foto anzusehen"
+          }
         }
       }
     },
@@ -52794,6 +53820,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fă o poză"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prendre une photo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto maken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto aufnehmen"
           }
         }
       }
@@ -52811,6 +53855,24 @@
             "state": "translated",
             "value": "O poză cu locul exact — robinetul, tabloul electric — te scutește de căutat în panică."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une photo de l’endroit exact — le robinet, le tableau électrique — vous évite de chercher dans la panique."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een foto van de exacte plek — de kraan, de meterkast — scheelt zoeken in paniek."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Foto der genauen Stelle — Hahn, Sicherungskasten — erspart dir die Suche in Panik."
+          }
         }
       }
     },
@@ -52826,6 +53888,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fotografie"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
           }
         }
       }
@@ -52843,6 +53923,24 @@
             "state": "translated",
             "value": "Alege din galerie"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir dans la photothèque"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies uit bibliotheek"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus Mediathek wählen"
+          }
         }
       }
     },
@@ -52858,6 +53956,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Șterge fotografia"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer la photo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto verwijderen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto entfernen"
           }
         }
       }
@@ -78394,6 +79510,24 @@
             "state": "translated",
             "value": "Ger la noapte — protejează plantele"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gel cette nuit — protégez vos plantes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vannacht vorst — bescherm je planten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute Nacht Frost — schütze deine Pflanzen"
+          }
         }
       }
     },
@@ -78409,6 +79543,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Plouă mâine — amână udatul"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pluie demain — inutile d’arroser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morgen regen — sla het water geven over"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morgen Regen — Gießen kann warten"
           }
         }
       }
@@ -78426,6 +79578,24 @@
             "state": "translated",
             "value": "Totul e în regulă"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout est en ordre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles op orde"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles erledigt"
+          }
         }
       }
     },
@@ -78441,6 +79611,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buget"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Budget"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Budget"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Budget"
           }
         }
       }
@@ -78458,6 +79646,24 @@
             "state": "translated",
             "value": "Luna aceasta"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce mois-ci"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze maand"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Monat"
+          }
         }
       }
     },
@@ -78473,6 +79679,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mesaj pentru casă"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message à la maison"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bericht aan het huis"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachricht ans Haus"
           }
         }
       }
@@ -78490,6 +79714,24 @@
             "state": "translated",
             "value": "Trimite mesaj în chat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer un message"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bericht sturen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachricht senden"
+          }
         }
       }
     },
@@ -78505,6 +79747,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Oprit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éteint"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uit"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus"
           }
         }
       }
@@ -78522,6 +79782,24 @@
             "state": "translated",
             "value": "Pornit"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allumé"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aan"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An"
+          }
         }
       }
     },
@@ -78537,6 +79815,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cheltuielile din luna aceasta pe proprietatea ta, în moneda gospodăriei."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les dépenses du mois pour votre propriété, dans la devise du foyer."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De uitgaven van deze maand voor je woning, in de valuta van het huishouden."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Ausgaben dieses Monats für dein Zuhause, in der Haushaltswährung."
           }
         }
       }
@@ -78554,6 +79850,24 @@
             "state": "translated",
             "value": "O singură complicație, domeniul PRVIO ales de tine — editeaz-o ca să schimbi."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une seule complication, le domaine PRVIO de votre choix — modifiez-la pour changer."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eén complicatie, met het PRVIO-domein van jouw keuze — wijzig haar om te wisselen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Komplikation, mit dem PRVIO-Bereich deiner Wahl — bearbeite sie zum Wechseln."
+          }
         }
       }
     },
@@ -78569,6 +79883,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Coletele aflate pe drum."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les colis en route."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pakketten onderweg."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pakete unterwegs."
           }
         }
       }
@@ -78586,6 +79918,24 @@
             "state": "translated",
             "value": "Scorul de sănătate al proprietății."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le score de santé de la propriété."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De gezondheidsscore van de woning."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Zustandswert deines Zuhauses."
+          }
         }
       }
     },
@@ -78601,6 +79951,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Articolele rămase pe lista de cumpărături."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles restants sur la liste de courses."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat er nog op het boodschappenlijstje staat."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was noch auf der Einkaufsliste steht."
           }
         }
       }
@@ -78618,6 +79986,24 @@
             "state": "translated",
             "value": "Sarcinile deschise, dintr-o privire."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les tâches ouvertes, en un coup d’œil."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open taken in één oogopslag."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offene Aufgaben auf einen Blick."
+          }
         }
       }
     },
@@ -78633,6 +80019,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Plantele care așteaptă apă."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les plantes qui attendent de l’eau."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planten die op water wachten."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pflanzen, die auf Wasser warten."
           }
         }
       }
@@ -78650,6 +80054,24 @@
             "state": "translated",
             "value": "Vremea Apple la proprietatea ta, cu sfaturi pentru grădină."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Weather pour votre propriété, avec des conseils pour le jardin."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Weather bij je woning, met tuintips."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Weather an deinem Zuhause, mit Gartentipps."
+          }
         }
       }
     },
@@ -78665,6 +80087,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Finalizează"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voltooien"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erledigen"
           }
         }
       }
@@ -78682,6 +80122,24 @@
             "state": "translated",
             "value": "Casa ta dintr-o privire: sarcini deschise, plante de udat, livrări."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre maison en un coup d’œil : tâches ouvertes, plantes à arroser, livraisons."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je huis in één oogopslag: open taken, planten om water te geven, leveringen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Zuhause auf einen Blick: offene Aufgaben, Pflanzen zum Gießen, Lieferungen."
+          }
         }
       }
     },
@@ -78697,6 +80155,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Apasă lung pe cadranul ceasului ca să adaugi complicațiile PRVIO: bugetul, sarcinile, plantele și seria casei apar și în Smart Stack."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez longuement le cadran pour ajouter les complications PRVIO : le budget, les tâches, les plantes et la série de la maison sont aussi dans le Smart Stack."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Houd de wijzerplaat ingedrukt om PRVIO-complicaties toe te voegen: budget, taken, planten en de reeks van het huis staan ook in de Smart Stack."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halte das Zifferblatt gedrückt, um PRVIO-Komplikationen hinzuzufügen: Budget, Aufgaben, Pflanzen und die Haus-Serie gibt’s auch im Smart Stack."
           }
         }
       }
@@ -78714,6 +80190,24 @@
             "state": "translated",
             "value": "Consumă 1"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utiliser 1"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 gebruiken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 verbrauchen"
+          }
         }
       }
     },
@@ -78729,6 +80223,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buget"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Budget"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Budget"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Budget"
           }
         }
       }
@@ -78746,6 +80258,24 @@
             "state": "translated",
             "value": "Fiecare sincronizare duce starea vie a casei: sarcini, plante, cumpărături, cămară, livrări, vremea, bugetul și seria casei — pe încheietură, chiar și offline."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque synchronisation apporte l’état de la maison en direct : tâches, plantes, courses, garde-manger, livraisons, météo, budget et série de la maison — à votre poignet, même hors ligne."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elke synchronisatie brengt de actuele staat van het huis mee: taken, planten, boodschappen, voorraad, leveringen, weer, budget en de reeks van het huis — om je pols, zelfs offline."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jede Synchronisierung bringt den aktuellen Stand des Hauses mit: Aufgaben, Pflanzen, Einkäufe, Vorrat, Lieferungen, Wetter, Budget und die Haus-Serie — an deinem Handgelenk, auch offline."
+          }
         }
       }
     },
@@ -78761,6 +80291,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Datele de pe ceas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Données sur votre montre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gegevens op je horloge"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daten auf deiner Uhr"
           }
         }
       }
@@ -78778,6 +80326,24 @@
             "state": "translated",
             "value": "Seria casei"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Série de la maison"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reeks van het huis"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haus-Serie"
+          }
         }
       }
     },
@@ -78793,6 +80359,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vremea"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Météo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wetter"
           }
         }
       }
@@ -78810,6 +80394,24 @@
             "state": "translated",
             "value": "Livrări"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Livraisons"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leveringen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lieferungen"
+          }
         }
       }
     },
@@ -78825,6 +80427,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Contacte de urgență"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contacts d’urgence"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noodcontacten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notfallkontakte"
           }
         }
       }
@@ -78842,6 +80462,24 @@
             "state": "translated",
             "value": "Pornește modul urgență"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer le mode urgence"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noodmodus starten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notfallmodus starten"
+          }
         }
       }
     },
@@ -78857,6 +80495,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pași de închidere"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Étapes de coupure"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afsluitstappen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schritte zum Absperren"
           }
         }
       }
@@ -78874,6 +80530,24 @@
             "state": "translated",
             "value": "Sănătate"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Santé"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gezondheid"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zustand"
+          }
         }
       }
     },
@@ -78889,6 +80563,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Previzualizare live a ceasului. Pagini: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aperçu en direct de la montre. Pages : %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live voorbeeld van het horloge. Pagina’s: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live-Vorschau der Uhr. Seiten: %@"
           }
         }
       }
@@ -78906,6 +80598,24 @@
             "state": "translated",
             "value": "Datele apar aici după prima sincronizare."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les données apparaîtront ici après la première synchronisation."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gegevens verschijnen hier na de eerste synchronisatie."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daten erscheinen hier nach der ersten Synchronisierung."
+          }
         }
       }
     },
@@ -78921,6 +80631,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ceasul tău, live"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre montre, en direct"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je horloge, live"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Uhr, live"
           }
         }
       }
@@ -78938,6 +80666,24 @@
             "state": "translated",
             "value": "Hartă"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carte"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaart"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karte"
+          }
         }
       }
     },
@@ -78953,6 +80699,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Comenzi"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commandes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bediening"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steuerung"
           }
         }
       }
@@ -78970,6 +80734,24 @@
             "state": "translated",
             "value": "Livrări"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Livraisons"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leveringen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lieferungen"
+          }
         }
       }
     },
@@ -78985,6 +80767,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Urgență"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urgence"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noodgeval"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notfall"
           }
         }
       }
@@ -79002,6 +80802,24 @@
             "state": "translated",
             "value": "Proprietate"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propriété"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woning"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grundstück"
+          }
         }
       }
     },
@@ -79017,6 +80835,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cămară"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garde-manger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorraad"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorrat"
           }
         }
       }
@@ -79034,6 +80870,24 @@
             "state": "translated",
             "value": "Plante"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plantes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pflanzen"
+          }
         }
       }
     },
@@ -79049,6 +80903,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Senzori"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capteurs"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sensoren"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sensoren"
           }
         }
       }
@@ -79066,6 +80938,24 @@
             "state": "translated",
             "value": "Cumpărături"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Courses"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boodschappen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einkauf"
+          }
         }
       }
     },
@@ -79081,6 +80971,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sarcini"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tâches"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufgaben"
           }
         }
       }
@@ -79098,6 +81006,24 @@
             "state": "translated",
             "value": "Meniu"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menu"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menu"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menü"
+          }
         }
       }
     },
@@ -79113,6 +81039,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Azi"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aujourd’hui"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vandaag"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute"
           }
         }
       }
@@ -79130,6 +81074,24 @@
             "state": "translated",
             "value": "Mută mai jos"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descendre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omlaag"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach unten"
+          }
         }
       }
     },
@@ -79145,6 +81107,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mută mai sus"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omhoog"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach oben"
           }
         }
       }
@@ -79162,6 +81142,24 @@
             "state": "translated",
             "value": "Ce e de făcut?"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qu’y a-t-il à faire ?"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat moet er gebeuren?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was steht an?"
+          }
         }
       }
     },
@@ -79177,6 +81175,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deschise"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En cours"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offen"
           }
         }
       }
@@ -79194,6 +81210,24 @@
             "state": "translated",
             "value": "Întârziat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En retard"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achterstallig"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überfällig"
+          }
         }
       }
     },
@@ -79209,6 +81243,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Coletele în drum spre casă"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les colis en route vers la maison"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pakketten op weg naar huis"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pakete auf dem Weg nach Hause"
           }
         }
       }
@@ -79226,6 +81278,24 @@
             "state": "translated",
             "value": "Proprietatea ta, pe hartă"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre propriété, sur la carte"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je woning, op de kaart"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Grundstück, auf der Karte"
+          }
         }
       }
     },
@@ -79241,6 +81311,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stocul cămării — consumă cu un tap"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stock du garde-manger — utilisez d’un toucher"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorraad — gebruik met één tik"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorrat — mit einem Tipp verbrauchen"
           }
         }
       }
@@ -79258,6 +81346,24 @@
             "state": "translated",
             "value": "Plantele care cer apă acum"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les plantes qui ont soif maintenant"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De planten die nu om water vragen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Pflanzen, die jetzt Wasser brauchen"
+          }
         }
       }
     },
@@ -79273,6 +81379,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lista de cumpărături, bifabilă din mers"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La liste de courses, à cocher en route"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het boodschappenlijstje, onderweg af te vinken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Einkaufsliste, unterwegs abhakbar"
           }
         }
       }
@@ -79290,6 +81414,24 @@
             "state": "translated",
             "value": "Bifează sarcini direct de pe încheietură"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cochez vos tâches depuis votre poignet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vink taken af vanaf je pols"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hake Aufgaben direkt am Handgelenk ab"
+          }
         }
       }
     },
@@ -79305,6 +81447,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Azi"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aujourd’hui"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vandaag"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute"
           }
         }
       }
@@ -79322,6 +81482,24 @@
             "state": "translated",
             "value": "Alege ce pagini apar pe ceas și trage pentru a le reordona. Modificările ajung pe ceas în câteva secunde."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez les pages affichées sur votre montre et faites-les glisser pour les réorganiser. Les changements arrivent sur la montre en quelques secondes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies welke pagina’s op je horloge staan en sleep om ze te ordenen. Wijzigingen staan binnen enkele seconden op je horloge."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle, welche Seiten auf deiner Uhr erscheinen, und zieh sie zum Sortieren. Änderungen sind in Sekunden auf der Uhr."
+          }
         }
       }
     },
@@ -79337,6 +81515,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pagini"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pages"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagina’s"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seiten"
           }
         }
       }
@@ -79354,6 +81550,24 @@
             "state": "translated",
             "value": "Cămară"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garde-manger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorraad"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorrat"
+          }
         }
       }
     },
@@ -79369,6 +81583,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld plants"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld plantes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld planten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Pflanzen"
           }
         }
       }
@@ -79412,6 +81644,60 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld de senzori"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 capteur"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld capteurs"
+                }
+              }
+            }
+          }
+        },
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 sensor"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld sensoren"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 Sensor"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Sensoren"
                 }
               }
             }
@@ -79462,6 +81748,60 @@
               }
             }
           }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 tâche"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld tâches"
+                }
+              }
+            }
+          }
+        },
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 taak"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld taken"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 Aufgabe"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Aufgaben"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -79477,6 +81817,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Plante"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plantes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pflanzen"
           }
         }
       }
@@ -79494,6 +81852,24 @@
             "state": "translated",
             "value": "Reîmprospătează de pe iPhone"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualiser depuis l’iPhone"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vernieuwen vanaf iPhone"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vom iPhone aktualisieren"
+          }
         }
       }
     },
@@ -79509,6 +81885,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ceasul arată tot ce vede rolul tău."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre montre affiche tout ce que votre rôle permet de voir."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je horloge toont alles wat jouw rol ziet."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Uhr zeigt alles, was deine Rolle sieht."
           }
         }
       }
@@ -79526,6 +81920,24 @@
             "state": "translated",
             "value": "Ceasul arată doar sarcinile și mesajele tale."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre montre n’affiche que vos tâches et vos messages."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je horloge toont alleen je eigen taken en berichten."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Uhr zeigt nur deine eigenen Aufgaben und Nachrichten."
+          }
         }
       }
     },
@@ -79541,6 +81953,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Încheie sesiunea"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminer la session"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessie beëindigen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sitzung beenden"
           }
         }
       }
@@ -79558,6 +81988,24 @@
             "state": "translated",
             "value": "Deschide sesiunea"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir la session"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessie openen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sitzung öffnen"
+          }
         }
       }
     },
@@ -79573,6 +82021,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pauză"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pauze"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
           }
         }
       }
@@ -79590,6 +82056,24 @@
             "state": "translated",
             "value": "Reia"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reprendre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hervatten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortsetzen"
+          }
         }
       }
     },
@@ -79605,6 +82089,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Începe sesiunea"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Démarrer la session"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessie starten"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sitzung starten"
           }
         }
       }
@@ -79622,6 +82124,24 @@
             "state": "translated",
             "value": "Personalizare"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnalisation"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalisatie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalisierung"
+          }
         }
       }
     },
@@ -79634,6 +82154,24 @@
           }
         },
         "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch"
+          }
+        },
+        "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Apple Watch"
@@ -79654,6 +82192,24 @@
             "state": "translated",
             "value": "De cumpărat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À acheter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te kopen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einzukaufen"
+          }
         }
       }
     },
@@ -79669,6 +82225,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Finalizează sarcina"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminer la tâche"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taak voltooien"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufgabe erledigen"
           }
         }
       }
@@ -79686,6 +82260,24 @@
             "state": "translated",
             "value": "„Finalizează sarcina în PRVIO”"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Termine ma tâche dans PRVIO »"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘Voltooi mijn taak in PRVIO’"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Erledige meine Aufgabe in PRVIO“"
+          }
         }
       }
     },
@@ -79701,6 +82293,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Finalizează următoarea sarcină"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminer la tâche suivante"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende taak voltooien"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Aufgabe erledigen"
           }
         }
       }
@@ -79718,6 +82328,24 @@
             "state": "translated",
             "value": "Gata — %@ e finalizată."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C’est fait — %@ est terminée."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klaar — %@ is voltooid."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erledigt — %@ ist abgeschlossen."
+          }
         }
       }
     },
@@ -79733,6 +82361,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ridică încheietura și vorbește — ceasul se actualizează instant, iar acțiunea ajunge pe telefon la următoarea sincronizare."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Levez le poignet et parlez — la montre se met à jour aussitôt, et l’action arrive sur votre iPhone à la prochaine synchronisation."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Til je pols op en spreek — het horloge werkt direct bij, en de actie bereikt je iPhone bij de volgende synchronisatie."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heb dein Handgelenk und sprich — die Uhr aktualisiert sich sofort, und die Aktion erreicht dein iPhone bei der nächsten Synchronisierung."
           }
         }
       }
@@ -79750,6 +82396,24 @@
             "state": "translated",
             "value": "Siri pe ceas"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri sur la montre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri op het horloge"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri auf der Uhr"
+          }
         }
       }
     },
@@ -79765,6 +82429,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nicio plantă nu are nevoie de apă acum."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune plante n’a besoin d’eau pour l’instant."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen enkele plant heeft nu water nodig."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gerade braucht keine Pflanze Wasser."
           }
         }
       }
@@ -79782,6 +82464,24 @@
             "state": "translated",
             "value": "Nimic de finalizat — totul e în regulă."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à terminer — tout est en ordre."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niets te voltooien — alles op orde."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts zu erledigen — alles erledigt."
+          }
         }
       }
     },
@@ -79797,6 +82497,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "„Udă plantele în PRVIO”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Arrose les plantes dans PRVIO »"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘Geef de planten water in PRVIO’"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Gieß die Pflanzen in PRVIO“"
           }
         }
       }
@@ -79814,6 +82532,24 @@
             "state": "translated",
             "value": "Udă plantele"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arroser les plantes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planten water geven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pflanzen gießen"
+          }
         }
       }
     },
@@ -79829,6 +82565,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Udă toate plantele"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arroser toutes les plantes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle planten water geven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Pflanzen gießen"
           }
         }
       }
@@ -79846,6 +82600,24 @@
             "state": "translated",
             "value": "Am udat %lld plante."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld plantes arrosées."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld planten water gegeven."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Pflanzen gegossen."
+          }
         }
       }
     },
@@ -79861,6 +82633,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "%d zile la rând"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d jours d’affilée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d dagen op rij"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Tage in Folge"
           }
         }
       }
@@ -79878,6 +82668,24 @@
             "state": "translated",
             "value": "Sincronizează"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniseren"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisieren"
+          }
         }
       }
     },
@@ -79893,6 +82701,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sincronizare"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisatie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisierung"
           }
         }
       }
@@ -79910,6 +82736,24 @@
             "state": "translated",
             "value": "PRVIO instalat pe ceas"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRVIO est installé sur la montre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRVIO staat op het horloge"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRVIO ist auf der Uhr installiert"
+          }
         }
       }
     },
@@ -79925,6 +82769,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ultima sincronizare"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernière synchronisation"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laatste synchronisatie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Synchronisierung"
           }
         }
       }
@@ -79942,6 +82804,24 @@
             "state": "translated",
             "value": "Încă nu"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas encore"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog niet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nicht"
+          }
         }
       }
     },
@@ -79957,6 +82837,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "PRVIO nu este instalat pe ceas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRVIO n’est pas installé sur la montre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRVIO staat niet op het horloge"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRVIO ist nicht auf der Uhr installiert"
           }
         }
       }
@@ -79974,6 +82872,24 @@
             "state": "translated",
             "value": "Niciun Apple Watch asociat cu acest iPhone"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune Apple Watch jumelée à cet iPhone"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen Apple Watch gekoppeld aan deze iPhone"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Apple Watch mit diesem iPhone gekoppelt"
+          }
         }
       }
     },
@@ -79989,6 +82905,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sincronizează acum"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser maintenant"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu synchroniseren"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt synchronisieren"
           }
         }
       }
@@ -80006,6 +82940,24 @@
             "state": "translated",
             "value": "Ceas asociat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Montre jumelée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horloge gekoppeld"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uhr gekoppelt"
+          }
         }
       }
     },
@@ -80021,6 +82973,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sincronizat %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisé %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesynchroniseerd %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisiert %@"
           }
         }
       }
@@ -80038,6 +83008,24 @@
             "state": "translated",
             "value": "Atinge pentru a bifa"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez pour cocher"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik om af te vinken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Abhaken tippen"
+          }
         }
       }
     },
@@ -80053,6 +83041,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atinge pentru a finaliza"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez pour terminer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik om te voltooien"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Erledigen tippen"
           }
         }
       }
@@ -80070,6 +83076,24 @@
             "state": "translated",
             "value": "Atinge pentru a uda"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez pour arroser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik om water te geven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Gießen tippen"
+          }
         }
       }
     },
@@ -80085,6 +83109,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sarcini"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tâches"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taken"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufgaben"
           }
         }
       }
@@ -80102,6 +83144,24 @@
             "state": "translated",
             "value": "Azi este întotdeauna prima pagină — nu poate fi ascunsă."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aujourd’hui est toujours la première page — elle ne peut pas être masquée."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vandaag is altijd de eerste pagina — die kun je niet verbergen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute ist immer die erste Seite — sie lässt sich nicht ausblenden."
+          }
         }
       }
     },
@@ -80117,6 +83177,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mereu prima pagină"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours la première page"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altijd de eerste pagina"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immer die erste Seite"
           }
         }
       }
@@ -80134,6 +83212,24 @@
             "state": "translated",
             "value": "necitite"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "non lus"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ongelezen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ungelesen"
+          }
         }
       }
     },
@@ -80149,6 +83245,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Actualizat"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mis à jour"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bijgewerkt"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisiert"
           }
         }
       }
@@ -80166,6 +83280,24 @@
             "state": "translated",
             "value": "Deschide PRVIO pe iPhone pentru sincronizare."
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez PRVIO sur votre iPhone pour synchroniser."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open PRVIO op je iPhone om te synchroniseren."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne PRVIO auf deinem iPhone zum Synchronisieren."
+          }
         }
       }
     },
@@ -80181,6 +83313,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Așteaptă datele"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En attente des données"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachten op gegevens"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warte auf Daten"
           }
         }
       }
@@ -80198,6 +83348,24 @@
             "state": "translated",
             "value": "De udat"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À arroser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Water geven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu gießen"
+          }
         }
       }
     },
@@ -80213,6 +83381,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Udă toate"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout arroser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles water geven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle gießen"
           }
         }
       }
@@ -80230,6 +83416,24 @@
             "state": "translated",
             "value": "Udă acum"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arroser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu water geven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt gießen"
+          }
         }
       }
     },
@@ -80245,6 +83449,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vreme"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Météo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wetter"
           }
         }
       }
@@ -87983,6 +91205,24 @@
             "state": "translated",
             "value": "Contact de încredere"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contact de confiance"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertrouwd contact"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertrauensperson"
+          }
         }
       }
     },
@@ -87999,6 +91239,24 @@
             "state": "translated",
             "value": "Configurează un contact de încredere"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir un contact de confiance"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel een vertrouwd contact in"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertrauensperson festlegen"
+          }
         }
       }
     },
@@ -88014,6 +91272,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adaugă persoana pe care să o suni în caz de urgență"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajoutez la personne à appeler en cas d’urgence"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg de persoon toe die je belt bij nood"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Füge die Person hinzu, die du im Notfall anrufst"
           }
         }
       }
@@ -92095,17 +95371,35 @@
       }
     },
     "watch_crash_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last Watch crash"
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last Watch crash"
           }
         },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ultimul crash pe Watch"
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ultimul crash pe Watch"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernier plantage de la Watch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laatste crash op Watch"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzter Absturz der Watch"
           }
         }
       }
@@ -92713,10 +96007,7 @@
     "en": { "stringUnit": { "state": "translated", "value": "Total" } },
     "ro": { "stringUnit": { "state": "translated", "value": "Total" } }
   } },
-  "Healthy": { "extractionState": "manual", "localizations": {
-    "en": { "stringUnit": { "state": "translated", "value": "Healthy" } },
-    "ro": { "stringUnit": { "state": "translated", "value": "Sănătoase" } }
-  } },
+  "Healthy": {"extractionState" : "manual", "localizations" : {"en" : {"stringUnit" : {"state" : "translated", "value" : "Healthy"}}, "ro" : {"stringUnit" : {"state" : "translated", "value" : "Sănătoase"}}, "fr" : {"stringUnit" : {"state" : "translated", "value" : "En bonne santé"}}, "nl" : {"stringUnit" : {"state" : "translated", "value" : "Gezond"}}, "de" : {"stringUnit" : {"state" : "translated", "value" : "Gesund"}}}},
   "supply_month_money_title": { "extractionState": "manual", "localizations": {
     "en": { "stringUnit": { "state": "translated", "value": "This month" } },
     "ro": { "stringUnit": { "state": "translated", "value": "Luna aceasta" } }
