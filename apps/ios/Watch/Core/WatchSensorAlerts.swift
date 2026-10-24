@@ -34,7 +34,8 @@ enum WatchSensorAlerts {
         }
         let fresh = critical.filter { !previous.contains($0.id) }
         guard !fresh.isEmpty else { return }
-        WKInterfaceDevice.current().play(.failure)
+        // A real alarm speaks .notification (DESIGN.md haptic vocabulary).
+        WatchHaptic.alarm.play()
         let alerts = fresh.map { sensor in
             (id: identifier(for: sensor.id),
              body: [sensor.name, sensor.zone, sensor.displayValue]

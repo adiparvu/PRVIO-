@@ -45,6 +45,12 @@ final class WatchStore {
     /// True while a live refresh request is in flight.
     private(set) var isRefreshing = false
 
+    /// The last all-clear the person caused on this wrist (a local edit
+    /// emptied tasks, thirsty plants, shopping, or all three). In memory
+    /// only: a payload from the phone, a reload or a relaunch never sets
+    /// it, so a celebration plays once per clear and never on reload.
+    private(set) var allClearEvent: WatchAllClearEvent? = nil
+
     // MARK: Derived
 
     /// When the phone built the snapshot on screen — the honest freshness.
@@ -79,6 +85,21 @@ final class WatchStore {
 
     /// Whether "Alert the family" can name the property.
     var canAlertFamily: Bool { payload.map(WatchRoute.canAlertFamily) ?? false }
+
+    /// How the home is doing: calm / attention / alarm (sky warmth, dial).
+    var householdState: WatchHouseholdState { WatchRoute.householdState(for: payload) }
+
+    /// Things due now (overdue + thirsty + alerting); a rise wiggles the dial.
+    var attentionCount: Int { WatchRoute.attentionCount(for: payload) }
+
+    /// Open tasks + thirsty plants + unbought shopping items.
+    var openItemCount: Int { WatchRoute.openItemCount(for: payload) }
+
+    /// A payload is present and nothing is left to clear.
+    var isAllClear: Bool { payload != nil && openItemCount == 0 }
+
+    /// The single most useful thing right now (see `WatchRoute.nextUp`).
+    var nextUp: WatchNextUp? { WatchRoute.nextUp(for: payload) }
 
     // MARK: Persistence (frozen keys)
 
@@ -126,6 +147,7 @@ final class WatchStore {
         self.payload = payload?.sanitizedForRender()
         self.session = session
         applyAtmosphere(from: self.payload)
+        WatchHaptic.isEnabled = false
     }
 
     /// Re-reads the cached payload when another process changed it (an
@@ -215,13 +237,14 @@ final class WatchStore {
     // MARK: Refresh
 
     /// Asks the phone for a fresh payload over the live channel. When the
-    /// phone is not reachable right now the retry haptic says so instead of
-    /// pretending; applicationContext still delivers eventually.
+    /// phone is not reachable right now the failure haptic says so instead
+    /// of pretending (a request that went out but came back empty plays
+    /// retry); applicationContext still delivers eventually.
     func requestRefresh() {
         guard !isRefreshing else { return }
         guard let connector,
               connector.requestPayload({ [weak self] data in self?.finishRefresh(data) }) else {
-            haptic(.retry)
+            haptic(.unreachable)
             return
         }
         isRefreshing = true
@@ -234,14 +257,14 @@ final class WatchStore {
             return
         }
         ingest(data, source: .refresh)
-        haptic(.click)
+        haptic(.tick)
     }
 
     // MARK: Tasks
 
     func completeTask(_ id: UUID) {
         applyTaskCompletion(id)
-        dispatch(.completeTask(id), haptic: .success)
+        dispatch(.completeTask(id), haptic: .done)
     }
 
     /// Dictated on the wrist; the phone creates the real task. Appears in
@@ -254,7 +277,7 @@ final class WatchStore {
                                                   isCompleted: false, isOverdue: false), at: 0)
             payload.snapshot.openTaskCount += 1
         }
-        dispatch(.createTask(title: trimmed), haptic: .success)
+        dispatch(.createTask(title: trimmed), haptic: .done)
     }
 
     private func applyTaskCompletion(_ id: UUID) {
@@ -276,7 +299,7 @@ final class WatchStore {
 
     func waterPlant(_ id: UUID) {
         applyWatering([id])
-        dispatch(.waterPlant(id), haptic: .directionUp)
+        dispatch(.waterPlant(id), haptic: .done)
     }
 
     /// One tap, every thirsty plant — each watering still syncs on its own
@@ -286,7 +309,7 @@ final class WatchStore {
         guard !ids.isEmpty else { return }
         applyWatering(ids)
         for id in ids { dispatch(.waterPlant(id), haptic: nil) }
-        haptic(.directionUp)
+        haptic(.done)
     }
 
     private func applyWatering(_ ids: [UUID]) {
@@ -309,7 +332,7 @@ final class WatchStore {
             payload.supplies[i].isCompleted = true
             payload.snapshot.pendingSupplyCount = payload.supplies.filter { !$0.isCompleted }.count
         }
-        dispatch(.checkSupply(id), haptic: .click)
+        dispatch(.checkSupply(id), haptic: .tick)
     }
 
     /// One unit off the pantry stock. Repeats are meaningful (each tap is a
@@ -320,13 +343,13 @@ final class WatchStore {
             guard let i = payload.pantry.firstIndex(where: { $0.id == id }) else { return }
             payload.pantry[i].quantity = max(0, ((payload.pantry[i].quantity - 1) * 10).rounded() / 10)
         }
-        dispatch(.consumePantry(id), haptic: .click)
+        dispatch(.consumePantry(id), haptic: .tick)
     }
 
     /// Pantry → shopping list. No optimistic supply row: the real one is
     /// born server-side with its own id and arrives in the next payload.
     func addPantryItemToShoppingList(_ id: UUID) {
-        dispatch(.pantryToList(id), haptic: .click)
+        dispatch(.pantryToList(id), haptic: .tick)
     }
 
     func markDeliveryReceived(_ id: UUID) {
@@ -338,7 +361,7 @@ final class WatchStore {
             payload.snapshot.activeDeliveryCount = payload.deliveries
                 .filter(WatchRoute.isDeliveryActive).count
         }
-        dispatch(.deliveryReceived(id), haptic: .success)
+        dispatch(.deliveryReceived(id), haptic: .done)
     }
 
     // MARK: Messages
@@ -347,7 +370,7 @@ final class WatchStore {
     func sendChatMessage(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        dispatch(.sendMessage(text: trimmed, target: .group), haptic: .success)
+        dispatch(.sendMessage(text: trimmed, target: .group), haptic: .done)
     }
 
     /// Dictated reply to a direct thread (`peerId` = the conversation id).
@@ -363,7 +386,7 @@ final class WatchStore {
             payload.dmConversations[i].lastAt = Date()
             payload.dmConversations[i].unread = 0
         }
-        dispatch(.sendMessage(text: trimmed, target: .direct(peerId)), haptic: .success)
+        dispatch(.sendMessage(text: trimmed, target: .direct(peerId)), haptic: .done)
     }
 
     // MARK: Emergency & smart home
@@ -372,14 +395,14 @@ final class WatchStore {
     /// sends into the household chat. Callers confirm first.
     func alertFamily() {
         guard canAlertFamily else { return }
-        dispatch(.alertFamily, haptic: .notification)
+        dispatch(.alertFamily, haptic: .alarm)
     }
 
     /// Asks the phone to raise the Emergency Live Activity (it can only do
     /// so in the foreground, so it lands on the phone's next active beat).
     func startEmergency() {
         guard isFamilyScope else { return }
-        dispatch(.startEmergency, haptic: .notification)
+        dispatch(.startEmergency, haptic: .alarm)
     }
 
     /// A command the actuator declared (`ActuatorCatalogEntry.commands`) —
@@ -395,7 +418,7 @@ final class WatchStore {
                 payload.actuators[i].isOn = (command == "on")
             }
         }
-        dispatch(.iotCommand(actuatorId: actuatorId, command: command), haptic: .click)
+        dispatch(.iotCommand(actuatorId: actuatorId, command: command), haptic: .tick)
     }
 
     // MARK: Work session
@@ -411,7 +434,7 @@ final class WatchStore {
         session = WatchWorkSession(taskId: task.id, title: task.title, startedAt: now,
                                    accumulated: 0, segmentStart: now)
         persistSession()
-        dispatch(.sessionStart(taskId: task.id, title: task.title, startedAt: now), haptic: .start)
+        dispatch(.sessionStart(taskId: task.id, title: task.title, startedAt: now), haptic: .sessionStart)
     }
 
     /// Freezes the clock here and on the phone, banking the time.
@@ -421,7 +444,7 @@ final class WatchStore {
         current.segmentStart = nil
         session = current
         persistSession()
-        dispatch(.sessionPause, haptic: .click)
+        dispatch(.sessionPause, haptic: .sessionStop)
     }
 
     func resumeSession() {
@@ -429,7 +452,7 @@ final class WatchStore {
         current.segmentStart = Date()
         session = current
         persistSession()
-        dispatch(.sessionResume, haptic: .start)
+        dispatch(.sessionResume, haptic: .sessionStart)
     }
 
     func toggleSessionPause() {
@@ -453,7 +476,7 @@ final class WatchStore {
             dispatch(.completeTask(ended.taskId), haptic: nil)
         }
         dispatch(.sessionEnd(completesTask: completingTask),
-                 haptic: completingTask ? .success : .stop)
+                 haptic: completingTask ? .done : .sessionStop)
     }
 
     private func persistSession() {
@@ -470,8 +493,10 @@ final class WatchStore {
 
     private func mutate(_ change: (inout WatchPayload) -> Void) {
         guard var current = payload else { return }
+        let before = ClearCounts(current)
         change(&current)
         payload = current
+        noteAllClear(from: before, to: ClearCounts(current))
         if let data = try? JSONEncoder().encode(current) {
             defaults.set(data, forKey: Key.payload)
             persistedPayloadData = data
@@ -479,16 +504,38 @@ final class WatchStore {
         reloadComplications()
     }
 
-    /// Each action speaks its own haptic dialect — completing lands with
-    /// success, watering lifts, checking off clicks.
-    private func dispatch(_ action: WatchAction, haptic type: WKHapticType?) {
-        if let type { haptic(type) }
+    /// Each action speaks the vocabulary in WatchHaptic (DESIGN.md) —
+    /// done lands with success, checking off clicks, sessions start/stop.
+    private func dispatch(_ action: WatchAction, haptic: WatchHaptic?) {
+        if let haptic { self.haptic(haptic) }
         connector?.transfer(action.userInfo())
     }
 
-    private func haptic(_ type: WKHapticType) {
+    private func haptic(_ haptic: WatchHaptic) {
         guard connector != nil else { return }
-        WKInterfaceDevice.current().play(type)
+        haptic.play()
+    }
+
+    /// The open counts an all-clear is measured on.
+    private struct ClearCounts {
+        let tasks: Int, plants: Int, shopping: Int
+        init(_ payload: WatchPayload) {
+            tasks = payload.tasks.filter { !$0.isCompleted }.count
+            plants = payload.plants.filter(\.needsWatering).count
+            shopping = payload.supplies.filter { !$0.isCompleted }.count
+        }
+        var household: Int { tasks + plants + shopping }
+    }
+
+    /// Records which lists this local edit just emptied (> 0 → 0).
+    private func noteAllClear(from before: ClearCounts, to after: ClearCounts) {
+        var scopes = Set<WatchClearScope>()
+        if before.tasks > 0, after.tasks == 0 { scopes.insert(.tasks) }
+        if before.plants > 0, after.plants == 0 { scopes.insert(.plants) }
+        if before.shopping > 0, after.shopping == 0 { scopes.insert(.shopping) }
+        if before.household > 0, after.household == 0 { scopes.insert(.household) }
+        guard !scopes.isEmpty else { return }
+        allClearEvent = WatchAllClearEvent(serial: (allClearEvent?.serial ?? 0) + 1, scopes: scopes)
     }
 
     private func reloadComplications() {

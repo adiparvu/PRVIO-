@@ -163,6 +163,48 @@ struct WatchBadge: Equatable {
     let isUrgent: Bool
 }
 
+/// How the home is doing, read from the payload — drives the sky's warmth,
+/// the dial and the headline. Never shown by colour alone.
+enum WatchHouseholdState: Equatable, Sendable {
+    /// Nothing due now.
+    case calm
+    /// Something waits (overdue task, thirsty plant, alerting sensor).
+    case attention
+    /// A critical sensor is alarming (family scope only).
+    case alarm
+}
+
+/// The one thing Next Up offers, with the entry its one-tap action needs.
+enum WatchNextUp: Identifiable {
+    case task(TaskCatalogEntry, isOverdue: Bool)
+    case plant(PlantCatalogEntry)
+    case delivery(DeliveryCatalogEntry)
+
+    /// Stable per item, so the card cross-fades only when the item changes.
+    var id: String {
+        switch self {
+        case .task(let task, _):    return "task-\(task.id.uuidString)"
+        case .plant(let plant):     return "plant-\(plant.id.uuidString)"
+        case .delivery(let parcel): return "delivery-\(parcel.id.uuidString)"
+        }
+    }
+}
+
+/// Which list a local edit just emptied (see `WatchStore.allClearEvent`).
+enum WatchClearScope: Hashable, Sendable {
+    case tasks, plants, shopping
+    /// Tasks, thirsty plants and shopping together reached zero.
+    case household
+}
+
+/// One all-clear moment caused by the person on this wrist. `serial`
+/// grows per launch and is never persisted, so a reload or relaunch can
+/// never replay a celebration.
+struct WatchAllClearEvent: Equatable, Sendable {
+    let serial: Int
+    let scopes: Set<WatchClearScope>
+}
+
 /// A value pushed onto any page's NavigationStack. Destinations are
 /// registered once per stack by RootView (`watchDestinations`), so feature
 /// views push these and never register them again.
@@ -257,6 +299,70 @@ enum WatchRoute {
     /// A parcel still on its way.
     static func isDeliveryActive(_ parcel: DeliveryCatalogEntry) -> Bool {
         parcel.status == "expected" || parcel.status == "out_for_delivery"
+    }
+
+    /// A parcel at the door today — the only delivery state worth Next Up.
+    static func isOutForDelivery(_ parcel: DeliveryCatalogEntry) -> Bool {
+        parcel.status == "out_for_delivery"
+    }
+
+    // MARK: Household reading (read-only, derived from the payload)
+
+    /// How the home is doing — the sky's warmth. Alarm only for a critical
+    /// sensor (family scope); attention when something is due now (an
+    /// overdue task, a thirsty plant, an alerting sensor); calm otherwise —
+    /// open-but-not-due tasks are calm, never pressure.
+    static func householdState(for payload: WatchPayload?) -> WatchHouseholdState {
+        guard let payload else { return .calm }
+        if payload.isFamilyScope,
+           payload.sensors.contains(where: { $0.isAlerting && $0.isCritical }) {
+            return .alarm
+        }
+        return attentionCount(for: payload) > 0 ? .attention : .calm
+    }
+
+    /// The things due now: overdue tasks + thirsty plants + alerting
+    /// sensors (family scope). Rising means "something new needs you".
+    static func attentionCount(for payload: WatchPayload?) -> Int {
+        guard let payload else { return 0 }
+        let overdue = payload.tasks.filter { !$0.isCompleted && $0.isOverdue == true }.count
+        let thirsty = payload.plants.filter(\.needsWatering).count
+        let alerting = payload.isFamilyScope ? payload.sensors.filter(\.isAlerting).count : 0
+        return overdue + thirsty + alerting
+    }
+
+    /// Open household items the person can clear from the wrist: open
+    /// tasks, thirsty plants and unbought shopping items. Zero = all clear.
+    static func openItemCount(for payload: WatchPayload?) -> Int {
+        guard let payload else { return 0 }
+        return payload.tasks.filter { !$0.isCompleted }.count
+            + payload.plants.filter(\.needsWatering).count
+            + payload.supplies.filter { !$0.isCompleted }.count
+    }
+
+    /// The single most useful thing right now, in the brief's order:
+    /// overdue task → thirsty plant → parcel out for delivery → next open
+    /// task. Each candidate is offered only when its page or module is
+    /// visible, so Next Up never acts on a surface the owner hid.
+    static func nextUp(for payload: WatchPayload?) -> WatchNextUp? {
+        guard let payload else { return nil }
+        let pages = visiblePages(for: payload)
+        let modules = visibleModules(for: payload)
+        let open = pages.contains(.tasks) ? payload.tasks.filter { !$0.isCompleted } : []
+        if let overdue = open.first(where: { $0.isOverdue == true }) {
+            return .task(overdue, isOverdue: true)
+        }
+        if pages.contains(.plants), let plant = payload.plants.first(where: \.needsWatering) {
+            return .plant(plant)
+        }
+        if modules.contains(.deliveries),
+           let parcel = payload.deliveries.first(where: WatchRoute.isOutForDelivery) {
+            return .delivery(parcel)
+        }
+        if let next = open.first {
+            return .task(next, isOverdue: false)
+        }
+        return nil
     }
 
     // MARK: Handoff

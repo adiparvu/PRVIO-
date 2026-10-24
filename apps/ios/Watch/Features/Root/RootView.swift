@@ -11,6 +11,7 @@ import SwiftUI
 struct RootView: View {
     @Environment(WatchStore.self) private var store
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var selection: WatchPage = .today
     @State private var todayPath = NavigationPath()
@@ -33,10 +34,18 @@ struct RootView: View {
         Group {
             if store.payload != nil {
                 pager
+                    .transition(.opacity)
             } else {
-                WaitingView()
+                // Its own stack, so the waiting screen wears the sky too
+                // (the ground paints the navigation container).
+                NavigationStack {
+                    WaitingView()
+                }
+                .transition(.opacity)
             }
         }
+        // First sync (or sign-out) cross-fades instead of snapping.
+        .animation(transitionAnimation, value: store.payload == nil)
         // A committed first frame means this launch survived — a sentinel
         // still set at the next launch is a death the handler couldn't see.
         .onAppear { WatchCrashRecorder.firstFrameRendered() }
@@ -94,6 +103,12 @@ struct RootView: View {
 
     // MARK: Selection
 
+    /// Page changes the app makes (deep links) glide like a crown scroll;
+    /// under Reduce Motion they cross-fade.
+    private var transitionAnimation: Animation {
+        WatchTheme.Motion.resolved(WatchTheme.Motion.smooth, reduceMotion: reduceMotion)
+    }
+
     private var clampedSelection: Binding<WatchPage> {
         Binding(
             get: { store.visiblePages.contains(selection) ? selection : .today },
@@ -113,16 +128,18 @@ struct RootView: View {
     private func open(_ link: WatchDeepLink) {
         switch link {
         case .page(let page):
-            selection = store.isVisible(page) ? page : .today
+            withAnimation(transitionAnimation) {
+                selection = store.isVisible(page) ? page : .today
+            }
         case .module(let module):
             guard store.isVisible(module), store.isVisible(.home) else {
-                selection = .today
+                withAnimation(transitionAnimation) { selection = .today }
                 return
             }
             var path = NavigationPath()
             path.append(WatchDestination.module(module))
             homePath = path
-            selection = .home
+            withAnimation(transitionAnimation) { selection = .home }
         }
     }
 }
@@ -165,16 +182,48 @@ struct WatchModuleScreen: View {
 }
 
 // MARK: - Waiting for the iPhone
+//
+// The same language as Home Pulse: the ring, a breathing glyph (calm — the
+// phone is on its way), one warm sentence, one action. When the phone is
+// out of reach it says so plainly instead of spinning.
 
 private struct WaitingView: View {
     @Environment(WatchStore.self) private var store
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
+
+    private var isOutOfReach: Bool {
+        store.connectivity == .unreachable || store.connectivity == .inactive
+    }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: WatchTheme.Spacing.m) {
-                EmptyStateView(systemImage: "iphone.and.arrow.forward",
-                               titleKey: "watch_waiting_title",
-                               messageKey: "watch_waiting_msg")
+            VStack(spacing: WatchTheme.Spacing.l) {
+                ZStack {
+                    Circle()
+                        .stroke(WatchTheme.Tint.calm.opacity(WatchTheme.Opacity.ringTrack),
+                                lineWidth: WatchTheme.Stroke.ring)
+                    Image(systemName: isOutOfReach ? "iphone.slash" : "iphone.and.arrow.forward")
+                        .font(WatchTheme.Typography.dialGlyph)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(isOutOfReach ? WatchTheme.Tint.attention : WatchTheme.Tint.calm)
+                        .contentTransition(reduceMotion ? ContentTransition.opacity
+                                                        : ContentTransition.symbolEffect(.replace))
+                        .symbolEffect(.breathe, isActive: !isOutOfReach && !reduceMotion && !isLuminanceReduced)
+                }
+                .frame(width: WatchTheme.Size.dial, height: WatchTheme.Size.dial)
+                .accessibilityHidden(true)
+
+                VStack(spacing: WatchTheme.Spacing.xs) {
+                    Text("watch_waiting_title")
+                        .font(WatchTheme.Typography.headline)
+                    Text(isOutOfReach ? "watch_waiting_unreachable" : "watch_waiting_msg")
+                        .font(WatchTheme.Typography.brief)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .multilineTextAlignment(.center)
+                .accessibilityElement(children: .combine)
 
                 if store.connectivity == .reachable {
                     Button {
@@ -186,6 +235,7 @@ private struct WaitingView: View {
                             Label("watch_sync_now", systemImage: "arrow.clockwise")
                         }
                     }
+                    .tint(WatchTheme.Tint.today)
                     .disabled(store.isRefreshing)
                 }
 
@@ -193,9 +243,8 @@ private struct WaitingView: View {
                 // the wrist's own black box (see WatchCrashRecorder).
                 if let note = store.crashNote {
                     VStack(alignment: .leading, spacing: WatchTheme.Spacing.xs) {
-                        Text("watch_crash_title")
-                            .font(WatchTheme.Typography.captionStrong)
-                            .foregroundStyle(WatchTheme.Tint.critical)
+                        StateLabel("watch_crash_title", systemImage: "exclamationmark.triangle.fill",
+                                   tint: WatchTheme.Tint.critical)
                         Text(verbatim: note)
                             .font(.system(.caption2, design: .monospaced))
                             .foregroundStyle(.secondary)
@@ -206,5 +255,7 @@ private struct WaitingView: View {
             }
             .padding(.horizontal, WatchTheme.Spacing.xs)
         }
+        .navigationTitle(Text(verbatim: "PRVIO"))
+        .skyGround()
     }
 }
