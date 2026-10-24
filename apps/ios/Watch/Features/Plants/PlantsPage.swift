@@ -10,7 +10,7 @@ import SwiftUI
 // Watering the last thirsty plant here celebrates once
 // (`watchAllClearCelebration(.plants)`).
 //
-// No primary double tap: this is a scrolling list inside the pager.
+// No primary double tap: this is a scrolling list.
 
 /// A push inside the Plants feature. Feature-specific so it never collides
 /// with another feature's route on a shared stack.

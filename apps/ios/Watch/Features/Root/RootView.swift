@@ -1,26 +1,44 @@
 import SwiftUI
 
-// MARK: - Root: the waiting screen, or the vertical pager
+// MARK: - Root: the waiting screen, or sections + the section on screen
 //
-// The pager shows only `store.visiblePages`; the selection is clamped to
-// that set on every read and corrected whenever it shrinks, so a tile, a
-// deep link or a vanished page can never strand the user on a missing tab.
-// Each page owns its own NavigationStack, and every stack registers the
-// shared `WatchDestination` routes once, here.
+// A NavigationSplitView, which the watch collapses into one stack:
+//
+//   Sections list  ─▶  section root (Today, Tasks, Shopping, …)  ─▶  details
+//
+// The app opens on Today (the detail column), never on the list. Going
+// back is always the same control in the same place — the system button in
+// the top leading corner (or a swipe from the left edge): inside a section
+// it pops one level; on a section root it returns to the list of sections.
+// Every section owns its own stack (`paths`), so leaving Tasks mid-detail
+// and coming back finds it where it was — until the app has been away long
+// enough that a fresh start is kinder (`freshStartAfter`): then it opens
+// on Today again, at the top.
+//
+// The selection is clamped to the visible sections on every read and
+// corrected whenever they shrink, so a tile, a deep link or a vanished
+// section can never strand the user on a missing screen.
 
 struct RootView: View {
     @Environment(WatchStore.self) private var store
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    @State private var selection: WatchPage = .today
-    @State private var todayPath = NavigationPath()
-    @State private var tasksPath = NavigationPath()
-    @State private var plantsPath = NavigationPath()
-    @State private var homePath = NavigationPath()
-    /// The module last opened in each page's stack, for Handoff; cleared
-    /// when that stack returns to its root.
-    @State private var focusedModules: [WatchPage: WatchModule] = [:]
+    /// The section in the detail column (kept while the list is showing,
+    /// so the system's back button can return to it).
+    @State private var selection: WatchSection = .today
+    /// Which column the collapsed split view shows; the system sets it to
+    /// `.sidebar` when back is pressed on a section root.
+    @State private var column: NavigationSplitViewColumn = .detail
+    @State private var paths: [WatchSection: NavigationPath] = [:]
+    /// The module last pushed in each section's stack, for Handoff;
+    /// cleared when that stack returns to its root.
+    @State private var pushedModules: [WatchSection: WatchModule] = [:]
+    @State private var backgroundedAt: Date? = nil
+
+    /// Away this long, the app reopens on Today at the top — a stale detail
+    /// from an hour ago is a "where am I?", not a continuation.
+    private static let freshStartAfter: TimeInterval = 10 * 60
 
     /// Advertising an NSUserActivity whose type the built Info.plist does not
     /// declare throws at first render on a real watch ("opens and instantly
@@ -33,7 +51,7 @@ struct RootView: View {
     var body: some View {
         Group {
             if store.payload != nil {
-                pager
+                split
                     .transition(.opacity)
             } else {
                 // Its own stack, so the waiting screen wears the sky too
@@ -49,97 +67,103 @@ struct RootView: View {
         // A committed first frame means this launch survived — a sentinel
         // still set at the next launch is a death the handler couldn't see.
         .onAppear { WatchCrashRecorder.firstFrameRendered() }
-        .onChange(of: scenePhase) {
-            if scenePhase == .active { store.reloadFromCache() }
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .background:
+                backgroundedAt = .now
+            case .active:
+                store.reloadFromCache()
+                if let backgroundedAt, Date.now.timeIntervalSince(backgroundedAt) > Self.freshStartAfter {
+                    startFresh()
+                }
+                backgroundedAt = nil
+            default:
+                break
+            }
         }
     }
 
-    // MARK: Pager
+    // MARK: Split view
 
-    private var pager: some View {
-        TabView(selection: clampedSelection) {
-            ForEach(store.visiblePages) { page in
-                stack(for: page)
-                    .tag(page)
+    private var split: some View {
+        NavigationSplitView(preferredCompactColumn: $column) {
+            SectionsView { section in
+                selection = section
+                column = .detail
             }
+        } detail: {
+            let section = visibleSelection
+            NavigationStack(path: path(for: section)) {
+                WatchSectionScreen(section: section)
+                    .watchDestinations { pushedModules[section] = $0 }
+            }
+            // One stack per section: switching sections never carries
+            // another section's pushes along.
+            .id(section)
         }
-        .tabViewStyle(.verticalPage)
-        .onChange(of: store.visiblePages) { clampSelection() }
-        .onChange(of: todayPath.count) { if todayPath.isEmpty { focusedModules[.today] = nil } }
-        .onChange(of: homePath.count) { if homePath.isEmpty { focusedModules[.home] = nil } }
+        .onChange(of: store.visibleSections) { clampSelection() }
+        .onChange(of: currentDepth) {
+            if currentDepth == 0 { pushedModules[selection] = nil }
+        }
         .onOpenURL { open(WatchDeepLink(url: $0)) }
         .userActivity(WatchRoute.handoffActivityType, isActive: Self.handoffDeclared) { activity in
+            let section = visibleSelection
             activity.isEligibleForHandoff = true
-            activity.userInfo = ["tab": WatchRoute.handoffTab(page: clampedSelection.wrappedValue,
-                                                             module: focusedModules[clampedSelection.wrappedValue])]
+            activity.userInfo = ["tab": WatchRoute.handoffTab(section: section, pushed: pushedModules[section])]
         }
     }
 
-    @ViewBuilder
-    private func stack(for page: WatchPage) -> some View {
-        switch page {
-        case .today:
-            NavigationStack(path: $todayPath) {
-                TodayView(selection: clampedSelection)
-                    .watchDestinations { focusedModules[.today] = $0 }
-            }
-        case .tasks:
-            NavigationStack(path: $tasksPath) {
-                TasksPage()
-                    .watchDestinations { focusedModules[.tasks] = $0 }
-            }
-        case .plants:
-            NavigationStack(path: $plantsPath) {
-                PlantsPage()
-                    .watchDestinations { focusedModules[.plants] = $0 }
-            }
-        case .home:
-            NavigationStack(path: $homePath) {
-                HomeHubView()
-                    .watchDestinations { focusedModules[.home] = $0 }
-            }
-        }
+    private func path(for section: WatchSection) -> Binding<NavigationPath> {
+        Binding(
+            get: { paths[section] ?? NavigationPath() },
+            set: { paths[section] = $0 }
+        )
+    }
+
+    private var currentDepth: Int {
+        paths[selection]?.count ?? 0
     }
 
     // MARK: Selection
 
-    /// Page changes the app makes (deep links) glide like a crown scroll;
-    /// under Reduce Motion they cross-fade.
+    /// Changes the app makes (deep links, fresh start) glide; under Reduce
+    /// Motion they cross-fade.
     private var transitionAnimation: Animation {
         WatchTheme.Motion.resolved(WatchTheme.Motion.smooth, reduceMotion: reduceMotion)
     }
 
-    private var clampedSelection: Binding<WatchPage> {
-        Binding(
-            get: { store.visiblePages.contains(selection) ? selection : .today },
-            set: { newValue in
-                selection = store.visiblePages.contains(newValue) ? newValue : .today
-            }
-        )
+    /// The selection, or Today when it is no longer on the list.
+    private var visibleSelection: WatchSection {
+        store.isVisible(selection) ? selection : .today
     }
 
     private func clampSelection() {
-        if !store.visiblePages.contains(selection) { selection = .today }
-        if !store.visiblePages.contains(.home) { homePath = NavigationPath() }
+        if !store.isVisible(selection) { selection = .today }
+        // Stacks of sections that vanished are dropped, not resurrected later.
+        paths = paths.filter { store.isVisible($0.key) }
+    }
+
+    /// Today, at the top, with every stack at its root.
+    private func startFresh() {
+        paths = [:]
+        pushedModules = [:]
+        selection = .today
+        column = .detail
     }
 
     // MARK: Deep links
 
     private func open(_ link: WatchDeepLink) {
+        let target: WatchSection
         switch link {
-        case .page(let page):
-            withAnimation(transitionAnimation) {
-                selection = store.isVisible(page) ? page : .today
-            }
-        case .module(let module):
-            guard store.isVisible(module), store.isVisible(.home) else {
-                withAnimation(transitionAnimation) { selection = .today }
-                return
-            }
-            var path = NavigationPath()
-            path.append(WatchDestination.module(module))
-            homePath = path
-            withAnimation(transitionAnimation) { selection = .home }
+        case .page(let page):     target = .page(page)
+        case .module(let module): target = .module(module)
+        }
+        let section = store.isVisible(target) ? target : .today
+        withAnimation(transitionAnimation) {
+            paths[section] = nil
+            selection = section
+            column = .detail
         }
     }
 }
@@ -147,7 +171,7 @@ struct RootView: View {
 // MARK: - Shared destinations
 
 extension View {
-    /// Registers the `WatchDestination` routes on a page's stack root.
+    /// Registers the `WatchDestination` routes on a section's stack root.
     /// RootView applies it once per stack; feature views push
     /// `WatchDestination` values and never register them again.
     func watchDestinations(onModuleShown: @escaping (WatchModule) -> Void = { _ in }) -> some View {
@@ -155,6 +179,8 @@ extension View {
             switch destination {
             case .workSession:
                 WorkSessionView()
+            case .page(let page):
+                WatchSectionScreen(section: .page(page))
             case .module(let module):
                 WatchModuleScreen(module: module)
                     .onAppear { onModuleShown(module) }
@@ -163,7 +189,21 @@ extension View {
     }
 }
 
-/// The screen behind each Home hub module.
+/// The root screen of a section.
+struct WatchSectionScreen: View {
+    let section: WatchSection
+
+    var body: some View {
+        switch section {
+        case .page(.today):       TodayView()
+        case .page(.tasks):       TasksPage()
+        case .page(.plants):      PlantsPage()
+        case .module(let module): WatchModuleScreen(module: module)
+        }
+    }
+}
+
+/// The screen behind each module.
 struct WatchModuleScreen: View {
     let module: WatchModule
 

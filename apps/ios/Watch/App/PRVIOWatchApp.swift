@@ -5,8 +5,8 @@ import WatchKit
 // MARK: - PRVIO for Apple Watch
 //
 // The phone pushes the same snapshot the widgets render (plus the catalogs
-// behind the lists) over WatchConnectivity; the wrist shows it in a short
-// vertical pager and acts on it optimistically. Layout, navigation and the
+// behind the lists) over WatchConnectivity; the wrist shows it as a list of
+// sections that opens on Today, and acts on it optimistically. Layout, navigation and the
 // frozen wire contract: Watch/ARCHITECTURE.md.
 
 @main

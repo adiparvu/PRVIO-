@@ -11,7 +11,7 @@ import SwiftUI
 // completing anything by accident. Clearing the last task here celebrates
 // once (`watchAllClearCelebration(.tasks)`).
 //
-// No primary double tap: this is a scrolling list inside the pager. The
+// No primary double tap: this is a scrolling list. The
 // one primary action — dictating a new task — lives in the bottom bar.
 
 /// A pushed task detail. Feature-specific so it never collides with another

@@ -13,11 +13,13 @@ compiled into the watch targets.
 
 1. **Glance first.** The watch answers "what needs me now?" in one look and
    acts in one tap. Anything deeper belongs on the phone.
-2. **Few top-level pages.** A vertical pager of at most four pages — Today,
-   Tasks, Plants, Home — instead of the old ten. Everything else is a row in
-   the Home hub, pushed in a `NavigationStack`.
-3. **HIG, current cycle.** No primary double-tap action in lists, scroll views
-   or the vertical pager (only on fixed, non-scrolling screens). No Liquid
+2. **One map, one way back.** One list of sections (the sidebar of a
+   collapsed `NavigationSplitView`); the app opens on Today, not on the list.
+   Back is always the system button in the top leading corner (or the left
+   edge swipe): one level up inside a section, the list from a section root.
+   At most two levels below the list.
+3. **HIG, current cycle.** No primary double-tap action in lists or scroll
+   views (only on fixed, non-scrolling screens). No Liquid
    Glass in the content layer — glass is for system chrome only. Text ≥ 11 pt
    in complications; system text styles everywhere in the app. Always On:
    respect `isLuminanceReduced` and `TimelineView` cadence. Primary actions
@@ -40,7 +42,7 @@ Watch/
     WatchStore.swift           @MainActor @Observable — state, ingest, persistence, optimistic edits
     WatchConnector.swift       WCSessionDelegate (nonisolated → hops to MainActor)
     WatchAction.swift          typed actions → userInfo dictionaries (frozen keys)
-    WatchRoute.swift           pages, hub modules, deep links, Handoff mapping, visibility
+    WatchRoute.swift           sections (pages + modules), deep links, Handoff mapping, visibility
     WatchSensorAlerts.swift    critical-sensor haptics + local notifications
   Design/
     WatchTheme.swift           tokens: tints, spacing, radii, strokes, type, motion, Always On, sky palette + warmth
@@ -48,11 +50,11 @@ Watch/
                                celebration, Crown stepper, rows, empty / all-clear states
     WatchHaptics.swift         the haptic vocabulary (DESIGN.md) — every haptic goes through it
   Features/
-    Root/RootView.swift        waiting screen, pager, deep links, Handoff
+    Root/RootView.swift        waiting screen, split view (list + section stacks), deep links, Handoff, fresh start
     Today/TodayView.swift      Home Pulse: dial + corners + headline, Next Up / celebration, brief, cards
     Tasks/…                    list, detail, new-task dictation, work session
     Plants/…                   thirsty list, detail, water all
-    Home/HomeHubView.swift     hub list → Shopping, Pantry, Deliveries, Messages, Map, Controls, Sensors, Emergency
+    Sections/SectionsView.swift the sections list: Today · everyday lists · house systems, live status + badges
     Shopping/ Pantry/ Deliveries/ Messages/ Map/ Controls/ Sensors/ Emergency/
   Intents/
     WatchAppShortcuts.swift    Siri shortcuts + App Entities for tasks and plants
@@ -61,21 +63,33 @@ Watch/
 
 ## Navigation
 
-- Root: `TabView(selection:)` with `.tabViewStyle(.verticalPage)` over
-  `WatchPage` = `.today`, `.tasks`, `.plants`, `.home`. A page is present only
-  when its data exists (`WatchRoute.visiblePages(for:)`); the selection is
-  clamped to the visible set, so a deep link can never land on a missing page.
-- Each page owns its own `NavigationStack`.
-- Home hub rows (`WatchModule`): shopping, pantry, deliveries, messages, map,
-  controls, sensors, emergency — ordered by the phone's `pageOrder`, shown
-  only when they have data, and emergency/controls/sensors only in family
-  scope (`isFamilyScope`).
-- Deep links `prvio://<host>`: `tasks`, `plants` select their page;
-  `shopping`/`supplies`, `pantry`, `deliveries`/`packages`, `messages`,
-  `emergency` select Home and push the module; anything else → Today.
+- Root: `NavigationSplitView(preferredCompactColumn:)`, collapsed by watchOS
+  into one stack. Sidebar: `SectionsView`, a `List(selection:)` of
+  `WatchSection` (`.page(WatchPage)` = today / tasks / plants,
+  `.module(WatchModule)` = shopping, pantry, deliveries, messages, map,
+  controls, sensors, emergency) in three groups — Today; the everyday lists
+  (Messages first, then Tasks / Plants / modules in the phone's `pageOrder`);
+  the house's systems (controls, sensors, emergency; family scope only).
+  A section is listed only when its data exists (`WatchRoute.sectionGroups`).
+- Detail: the selected section's root inside its own `NavigationStack`
+  (`.id(section)`); each section keeps its own path, so returning to a
+  section finds it where it was. The launch selection is Today with the
+  detail column preferred — the app never opens on the list.
+- Back: the system's top-leading button and edge swipe only — never a custom
+  back button. Inside a section it pops; at a section root it returns to
+  the list. Depth: list → section → detail (→ work session from a task).
+- Fresh start: after 10 minutes in the background every stack is reset and
+  the app reopens on Today at the top.
+- Today's corners and cards push `WatchDestination.page/.module/.workSession`
+  on Today's own stack, so back returns to Today.
+- The selection is clamped to the visible sections; a deep link or a vanished
+  section can never land on a missing screen.
+- Deep links `prvio://<host>`: `tasks`, `plants`, `shopping`/`supplies`,
+  `pantry`, `deliveries`/`packages`, `messages`, `emergency` select that
+  section at its root; anything else → Today.
 - Handoff: `com.prvio.page` with `userInfo["tab"]` (today→home,
   tasks→tasks, plants→plants, shopping→supplies, messages→chat, map→map,
-  others→home).
+  others→home) — the module on screen wins over its page.
 
 ## Frozen contract (do not change)
 
@@ -139,9 +153,9 @@ struct ShoppingView: View {
 ### Navigation rules
 
 - **Never create a `NavigationStack`** in a feature view. `RootView` wraps each
-  pager page (`TodayView`, `TasksPage`, `PlantsPage`, `HomeHubView`) in its own
-  stack, and module views (`ShoppingView` … `EmergencyView`) and
-  `WorkSessionView` are always *pushed* onto one of those stacks.
+  section root (`TodayView`, `TasksPage`, `PlantsPage`, `ShoppingView` …
+  `EmergencyView`) in its own stack; `WorkSessionView` and details are always
+  *pushed* onto one of those stacks. Never add a custom back button.
 - Shared routes are `WatchDestination` values, registered once per stack by
   `RootView` (`.watchDestinations`). Push them with
   `NavigationLink(value: WatchDestination.workSession) { … }` or
@@ -153,15 +167,15 @@ struct ShoppingView: View {
   — several features share the Home stack and a shared key type collides.
 - Leave a pushed screen with `@Environment(\.dismiss)`. `WorkSessionView` must
   `dismiss()` itself when `store.session` becomes nil.
-- Switching pager pages is RootView's job (Today tiles do it through a
-  binding); feature views do not select pages.
+- Selecting sections is RootView's job (deep links, fresh start); feature
+  views push `WatchDestination` values instead, so back always returns.
 - Every page root and pushed screen applies `.skyGround()` (Emergency:
   `.signalGround(WatchTheme.Tint.emergency)`) and sets
   `.navigationTitle(Text(<key>))` — module titles: `Text(module.titleKey)`.
   (`.watchPageGround(_:)` / `.watchSignalGround(_:)` still compile and forward
   to these; new code uses the new names.)
-- HIG: no `handGestureShortcut(.primaryAction)` in lists, scroll views or the
-  pager — only on a fixed, non-scrolling screen (e.g. `WorkSessionView` when
+- HIG: no `handGestureShortcut(.primaryAction)` in lists or scroll views —
+  only on a fixed, non-scrolling screen (e.g. `WorkSessionView` when
   its layout fits; fall back to a `ScrollView` without it via `ViewThatFits`).
   Primary actions go in `ToolbarItem(placement: .bottomBar)`, secondary ones
   in `.topBarTrailing`. No `glassEffect` in content.
@@ -190,8 +204,11 @@ var accountId: String?
 var isFamilyScope: Bool                   // true when no payload
 var visiblePages: [WatchPage]
 var visibleModules: [WatchModule]
+var sectionGroups: [[WatchSection]]       // the sections list, grouped
+var visibleSections: [WatchSection]
 func isVisible(_ page: WatchPage) -> Bool
 func isVisible(_ module: WatchModule) -> Bool
+func isVisible(_ section: WatchSection) -> Bool
 var openTasks: [TaskCatalogEntry]         // open only, overdue first
 var thirstyPlants: [PlantCatalogEntry]    // needsWatering
 var pendingSupplies: [SupplyCatalogEntry] // !isCompleted
@@ -256,7 +273,7 @@ existing catalog keys `Expected`, `Out for delivery`, `Delivered`, `Missed`,
 ### Routes (Core/WatchRoute.swift)
 
 ```swift
-enum WatchPage: String, CaseIterable, Hashable, Identifiable { case today, tasks, plants, home
+enum WatchPage: String, CaseIterable, Hashable, Identifiable, Codable { case today, tasks, plants
     var titleKey: LocalizedStringKey; var systemImage: String; var tint: Color }
 
 enum WatchModule: String, CaseIterable, Hashable, Identifiable, Codable {
@@ -276,7 +293,9 @@ enum WatchNextUp: Identifiable {
 enum WatchClearScope: Hashable, Sendable { case tasks, plants, shopping, household }
 struct WatchAllClearEvent: Equatable, Sendable { let serial: Int; let scopes: Set<WatchClearScope> }
 
-enum WatchDestination: Hashable, Codable { case module(WatchModule); case workSession }
+enum WatchSection: Hashable, Identifiable, Codable { case page(WatchPage); case module(WatchModule)
+    static let today; var titleKey; var systemImage; var tint }
+enum WatchDestination: Hashable, Codable { case page(WatchPage); case module(WatchModule); case workSession }
 enum WatchDeepLink: Equatable { case page(WatchPage); case module(WatchModule); init(url: URL) }
 
 enum WatchRoute {
@@ -284,6 +303,8 @@ enum WatchRoute {
     static func pageOrder(for payload: WatchPayload) -> [String]
     static func visiblePages(for payload: WatchPayload?) -> [WatchPage]
     static func visibleModules(for payload: WatchPayload?) -> [WatchModule]
+    static func sectionGroups(for payload: WatchPayload?) -> [[WatchSection]]
+    static func visibleSections(for payload: WatchPayload?) -> [WatchSection]
     static func canAlertFamily(_ payload: WatchPayload) -> Bool
     static func isDeliveryActive(_ parcel: DeliveryCatalogEntry) -> Bool
     static func isOutForDelivery(_ parcel: DeliveryCatalogEntry) -> Bool   // status out_for_delivery
@@ -292,13 +313,13 @@ enum WatchRoute {
     static func openItemCount(for payload: WatchPayload?) -> Int
     static func nextUp(for payload: WatchPayload?) -> WatchNextUp?     // only from visible pages/modules
     static let handoffActivityType: String            // "com.prvio.page"
-    static func handoffTab(page: WatchPage, module: WatchModule?) -> String
+    static func handoffTab(section: WatchSection, pushed: WatchModule?) -> String
 }
 ```
 
 Visibility: Today always; Tasks while enabled in `pageOrder` (even with no
 open task — the all-clear and dictation live there); Plants when enabled and
-at least one plant exists; Home when any module is visible. Modules: Messages
+at least one plant exists. Modules: Messages
 (DMs exist) first, then shopping (open items) / pantry (items) / deliveries
 (any) / map (coordinates) in `pageOrder` order and only if listed, then
 controls (actuators), sensors (sensors), emergency (property name, contacts

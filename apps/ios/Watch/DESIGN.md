@@ -70,10 +70,10 @@ seconds disappear, private text redacts.
 
 ## Layout rules
 
-- Pager of four pages (Today, Tasks, Plants, Home); Today's top is a dial,
-  list pages are lists, details are infographics.
-- Primary list actions in `.bottomBar`; no double tap in lists or the
-  pager; double tap only on the fixed work-session screen.
+- One list of sections; the app opens on Today. Back is always the system
+  button top leading (one level up; the list from a section root). Today's
+  top is a dial, list sections are lists, details are infographics.
+- Primary list actions in `.bottomBar`; no double tap in lists; double tap only on the fixed work-session screen.
 - Text styles only (Dynamic Type), SF Rounded for numerals.
 - Every state readable without color: symbol + word.
 - VoiceOver: every control has a label and value; the dial reads as one

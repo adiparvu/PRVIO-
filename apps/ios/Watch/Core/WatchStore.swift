@@ -62,14 +62,26 @@ final class WatchStore {
     /// False for an outsider-scoped payload (tenant / guest / worker).
     var isFamilyScope: Bool { payload?.isFamilyScope ?? true }
 
-    /// The pager's pages, in order (Today always first).
+    /// Today, Tasks, Plants — the first-class sections, in order.
     var visiblePages: [WatchPage] { WatchRoute.visiblePages(for: payload) }
 
-    /// The Home hub's modules, in order.
+    /// The other visible sections, in order.
     var visibleModules: [WatchModule] { WatchRoute.visibleModules(for: payload) }
+
+    /// The sections list, grouped (see `WatchRoute.sectionGroups`).
+    var sectionGroups: [[WatchSection]] { WatchRoute.sectionGroups(for: payload) }
+
+    /// Every section on the list, in order.
+    var visibleSections: [WatchSection] { WatchRoute.visibleSections(for: payload) }
 
     func isVisible(_ page: WatchPage) -> Bool { visiblePages.contains(page) }
     func isVisible(_ module: WatchModule) -> Bool { visibleModules.contains(module) }
+    func isVisible(_ section: WatchSection) -> Bool {
+        switch section {
+        case .page(let page):     return isVisible(page)
+        case .module(let module): return isVisible(module)
+        }
+    }
 
     /// Open tasks, overdue first, catalog order within each group.
     var openTasks: [TaskCatalogEntry] {

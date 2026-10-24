@@ -15,7 +15,6 @@ import SwiftUI
 //   5. How fresh the data is.
 
 struct TodayView: View {
-    @Binding var selection: WatchPage
     @Environment(WatchStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -156,13 +155,12 @@ struct TodayView: View {
         return Text(verbatim: " ") + Text("watch_dial_health_ax \(score)")
     }
 
-    /// A corner that selects a pager page — only when the pager has it.
+    /// A corner that opens Tasks or Plants on Today's stack — only when the
+    /// section is visible — so the back button returns to Today.
     @ViewBuilder
     private func pageCorner(_ page: WatchPage, _ readout: CornerReadout<Text>) -> some View {
         if store.isVisible(page) {
-            Button {
-                withAnimation(animation) { selection = page }
-            } label: {
+            NavigationLink(value: WatchDestination.page(page)) {
                 readout
             }
             .buttonStyle(.plain)
@@ -171,7 +169,7 @@ struct TodayView: View {
         }
     }
 
-    /// A corner that pushes a hub module on Today's stack — only when visible.
+    /// A corner that pushes a module on Today's stack — only when visible.
     @ViewBuilder
     private func moduleCorner(_ module: WatchModule, _ readout: CornerReadout<Text>) -> some View {
         if store.isVisible(module) {

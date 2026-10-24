@@ -6,7 +6,7 @@ import SwiftUI
 // A tap checks the item at once — the store plays the click and syncs —
 // while the row lingers for a beat, struck through, and then slides out.
 // Emptying the list draws the all-clear celebration (once per clear, never
-// on reload). A scrolling list inside the pager: no primary double tap.
+// on reload). A scrolling list: no primary double tap.
 
 struct ShoppingView: View {
     @Environment(WatchStore.self) private var store

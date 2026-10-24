@@ -1,14 +1,15 @@
 import SwiftUI
 
-// MARK: - Routes: pager pages, Home hub modules, deep links, Handoff
+// MARK: - Routes: sections, deep links, Handoff
 //
-// Visibility is decided here and nowhere else, so the pager, the Today
-// tiles, the hub and deep links can never disagree about what exists — the
-// old app's tiles and links could select pages missing from the pager.
+// The app is one list of sections (the sidebar of a collapsed
+// NavigationSplitView) and the section on screen. Visibility is decided
+// here and nowhere else, so the list, the Today tiles and deep links can
+// never disagree about what exists.
 
-/// A top-level page of the vertical pager, in pager order.
-enum WatchPage: String, CaseIterable, Hashable, Identifiable {
-    case today, tasks, plants, home
+/// A first-class section: Today and the two daily lists.
+enum WatchPage: String, CaseIterable, Hashable, Identifiable, Codable {
+    case today, tasks, plants
 
     var id: String { rawValue }
 
@@ -17,7 +18,6 @@ enum WatchPage: String, CaseIterable, Hashable, Identifiable {
         case .today:  return "watch_menu_today"
         case .tasks:  return "watch_menu_tasks"
         case .plants: return "watch_menu_plants"
-        case .home:   return "watch_page_home"
         }
     }
 
@@ -26,7 +26,6 @@ enum WatchPage: String, CaseIterable, Hashable, Identifiable {
         case .today:  return "sun.max.fill"
         case .tasks:  return "checklist"
         case .plants: return "leaf.fill"
-        case .home:   return "square.grid.2x2.fill"
         }
     }
 
@@ -35,7 +34,6 @@ enum WatchPage: String, CaseIterable, Hashable, Identifiable {
         case .today:  return WatchTheme.Tint.today
         case .tasks:  return WatchTheme.Tint.tasks
         case .plants: return WatchTheme.Tint.plants
-        case .home:   return WatchTheme.Tint.home
         }
     }
 
@@ -44,12 +42,12 @@ enum WatchPage: String, CaseIterable, Hashable, Identifiable {
         switch self {
         case .tasks:  return "tasks"
         case .plants: return "plants"
-        case .today, .home: return nil
+        case .today:  return nil
         }
     }
 }
 
-/// A row of the Home hub, pushed in a NavigationStack.
+/// Every other surface of the house.
 enum WatchModule: String, CaseIterable, Hashable, Identifiable, Codable {
     case shopping, pantry, deliveries, messages, map, controls, sensors, emergency
 
@@ -132,7 +130,7 @@ enum WatchModule: String, CaseIterable, Hashable, Identifiable, Codable {
         }
     }
 
-    /// What needs the user in this module, as a row badge — nil when
+    /// What needs the user in this module, as a section-row badge — nil when
     /// nothing does (a badge is a call to act, not an inventory count).
     func badge(in payload: WatchPayload) -> WatchBadge? {
         let count: Int
@@ -157,7 +155,7 @@ enum WatchModule: String, CaseIterable, Hashable, Identifiable, Codable {
     }
 }
 
-/// A count badge on a hub row.
+/// A count badge on a section row.
 struct WatchBadge: Equatable {
     let count: Int
     let isUrgent: Bool
@@ -205,10 +203,49 @@ struct WatchAllClearEvent: Equatable, Sendable {
     let scopes: Set<WatchClearScope>
 }
 
-/// A value pushed onto any page's NavigationStack. Destinations are
+/// One row of the sections list and the screen it opens. Wraps the two
+/// vocabularies so the list, the selection and Handoff share one type.
+enum WatchSection: Hashable, Identifiable, Codable {
+    case page(WatchPage)
+    case module(WatchModule)
+
+    static let today = WatchSection.page(.today)
+
+    var id: String {
+        switch self {
+        case .page(let page):     return "page-\(page.rawValue)"
+        case .module(let module): return "module-\(module.rawValue)"
+        }
+    }
+
+    var titleKey: LocalizedStringKey {
+        switch self {
+        case .page(let page):     return page.titleKey
+        case .module(let module): return module.titleKey
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .page(let page):     return page.systemImage
+        case .module(let module): return module.systemImage
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .page(let page):     return page.tint
+        case .module(let module): return module.tint
+        }
+    }
+}
+
+/// A value pushed onto a section's NavigationStack. Destinations are
 /// registered once per stack by RootView (`watchDestinations`), so feature
-/// views push these and never register them again.
+/// views push these and never register them again. Today's tiles push
+/// `.page` / `.module` so the back chevron returns to Today.
 enum WatchDestination: Hashable, Codable {
+    case page(WatchPage)
     case module(WatchModule)
     case workSession
 }
@@ -244,9 +281,8 @@ enum WatchRoute {
         return (payload.pageOrder ?? defaultOrder).filter { seen.insert($0).inserted }
     }
 
-    /// The pager, in order: Today (always), Tasks and Plants as the owner
-    /// ordered and enabled them, then Home when any module is visible.
-    /// Tasks stays while enabled even with no open task — the all-clear is
+    /// The first-class sections, in order: Today (always), then Tasks and
+    /// Plants as the owner ordered and enabled them. Tasks stays while enabled even with no open task — the all-clear is
     /// real information and the page hosts dictating a new one. Plants
     /// needs at least one plant.
     static func visiblePages(for payload: WatchPayload?) -> [WatchPage] {
@@ -266,11 +302,37 @@ enum WatchRoute {
             default:      pages.append(page)
             }
         }
-        if !visibleModules(for: payload).isEmpty { pages.append(.home) }
         return pages
     }
 
-    /// The hub rows, in order: Messages first (communication leads), the
+    /// The sections list, as groups shown with a gap between them:
+    /// 1. Today — where the app opens;
+    /// 2. the everyday lists — Tasks, Plants and the owner-ordered modules,
+    ///    with Messages first (communication leads);
+    /// 3. the house's systems — Controls, Sensors, Emergency (family only).
+    /// Empty groups are dropped.
+    static func sectionGroups(for payload: WatchPayload?) -> [[WatchSection]] {
+        let pages = visiblePages(for: payload)
+        let modules = visibleModules(for: payload)
+        let systems: Set<WatchModule> = [.controls, .sensors, .emergency]
+        let everyday = pages.filter { $0 != .today }.map(WatchSection.page)
+        var daily = modules.filter { !systems.contains($0) }.map(WatchSection.module)
+        if daily.first == .module(.messages) {
+            daily.removeFirst()
+            daily = [.module(.messages)] + everyday + daily
+        } else {
+            daily = everyday + daily
+        }
+        let house = modules.filter(systems.contains).map(WatchSection.module)
+        return [[.today], daily, house].filter { !$0.isEmpty }
+    }
+
+    /// Every section on the list, in order.
+    static func visibleSections(for payload: WatchPayload?) -> [WatchSection] {
+        sectionGroups(for: payload).flatMap { $0 }
+    }
+
+    /// The visible modules, in order: Messages first (communication leads), the
     /// owner-ordered modules, then Controls, Sensors, Emergency. A module is
     /// listed only when it has content, the owner has not hidden it, and —
     /// for family surfaces — the payload is family-scoped.
@@ -369,9 +431,16 @@ enum WatchRoute {
 
     static let handoffActivityType = "com.prvio.page"
 
-    /// `userInfo["tab"]` for the phone router: the pushed module when there
-    /// is one the phone has a tab for, else the page.
-    static func handoffTab(page: WatchPage, module: WatchModule?) -> String {
+    /// `userInfo["tab"]` for the phone router: the module on screen (the
+    /// section itself, or one pushed on top of it) when the phone has a tab
+    /// for it, else the page.
+    static func handoffTab(section: WatchSection, pushed: WatchModule?) -> String {
+        let module: WatchModule?
+        let page: WatchPage
+        switch section {
+        case .page(let p):   page = p; module = pushed
+        case .module(let m): page = .today; module = m
+        }
         switch module {
         case .some(.shopping): return "supplies"
         case .some(.messages): return "chat"
@@ -382,7 +451,7 @@ enum WatchRoute {
         switch page {
         case .tasks:         return "tasks"
         case .plants:        return "plants"
-        case .today, .home:  return "home"
+        case .today:         return "home"
         }
     }
 }

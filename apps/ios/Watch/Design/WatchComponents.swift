@@ -340,7 +340,7 @@ struct StateLabel: View {
 /// is ignored while the item leaves); `isRepeatable` acts on every tap with
 /// no delay. `haptic` plays on tap — leave it nil when the action is a
 /// WatchStore intent, which already speaks its own haptic. Never a primary
-/// double-tap action — rows live in scrolling lists inside the pager.
+/// double-tap action — rows live in scrolling lists.
 struct ActionGlyphButton: View {
     enum Prominence { case row, prominent }
 
@@ -756,59 +756,6 @@ struct CountBadge: View {
         .padding(.horizontal, WatchTheme.Spacing.xs + 1)
         .padding(.vertical, 1)
         .background(isUrgent ? WatchTheme.Tint.critical : tint, in: Capsule())
-    }
-}
-
-// MARK: - ModuleRow
-
-/// A Home hub row: tinted glyph, title, optional badge. The caller wraps it
-/// in a NavigationLink and gives it `.watchRowBackground(tint)`.
-struct ModuleRow: View {
-    let titleKey: LocalizedStringKey
-    let systemImage: String
-    let tint: Color
-    var badge: WatchBadge? = nil
-
-    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
-
-    init(titleKey: LocalizedStringKey, systemImage: String, tint: Color, badge: WatchBadge? = nil) {
-        self.titleKey = titleKey
-        self.systemImage = systemImage
-        self.tint = tint
-        self.badge = badge
-    }
-
-    /// The row for a hub module, badged from the payload.
-    init(module: WatchModule, payload: WatchPayload) {
-        self.init(titleKey: module.titleKey, systemImage: module.systemImage,
-                  tint: module.tint, badge: module.badge(in: payload))
-    }
-
-    var body: some View {
-        HStack(spacing: WatchTheme.Spacing.m) {
-            Image(systemName: systemImage)
-                .font(WatchTheme.Typography.glyph)
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(tint)
-                .frame(width: WatchTheme.Size.rowIcon, height: WatchTheme.Size.rowIcon)
-                .background {
-                    if isLuminanceReduced {
-                        Circle().strokeBorder(tint.opacity(WatchTheme.AlwaysOn.strokeOpacity),
-                                              lineWidth: WatchTheme.Stroke.hairline)
-                    } else {
-                        Circle().fill(tint.opacity(WatchTheme.Opacity.glyphFill))
-                    }
-                }
-            Text(titleKey)
-                .font(WatchTheme.Typography.rowTitle)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-            Spacer(minLength: 0)
-            if let badge {
-                CountBadge(count: badge.count, tint: tint, isUrgent: badge.isUrgent)
-            }
-        }
-        .accessibilityElement(children: .combine)
     }
 }
 
