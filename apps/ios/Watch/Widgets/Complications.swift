@@ -16,7 +16,7 @@ private enum DomainComplicationConfiguration {
                      description: LocalizedStringKey) -> some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: DomainTimelineProvider(domain: domain)) { entry in
             DomainFace(domain: entry.domain, payload: entry.payload)
-                .complicationBackground(.of(entry.domain, entry.payload))
+                .complicationGround(.of(entry.domain, entry.payload))
         }
         // The face picker already groups by app, so the name is the domain
         // itself rather than "PRVIO · …".
@@ -96,7 +96,7 @@ struct PRVIOChoiceComplication: Widget {
                                intent: PRVIODomainConfigIntent.self,
                                provider: ChoiceTimelineProvider()) { entry in
             DomainFace(domain: entry.domain, payload: entry.payload)
-                .complicationBackground(.of(entry.domain, entry.payload))
+                .complicationGround(.of(entry.domain, entry.payload))
         }
         .configurationDisplayName(Text(verbatim: "PRVIO +"))
         .description(Text("watch_comp_choice_desc"))

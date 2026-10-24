@@ -62,6 +62,79 @@ struct CompleteTopTaskIntent: AppIntent {
     }
 }
 
+// MARK: - Now card actions
+//
+// New type names (not part of the frozen list), used only by buttons on the
+// "Now at home" card. They reuse the frozen relay actions `waterPlant` and
+// `deliveryReceived`, so the phone needs nothing new.
+
+struct WaterPlantIntent: AppIntent {
+    static let title: LocalizedStringResource = "watch_siri_plant_title"
+    static let isDiscoverable = false
+
+    @Parameter(title: "watch_plants")
+    var plantId: String
+
+    init() { plantId = "" }
+    init(plantId: String) { self.plantId = plantId }
+
+    func perform() async throws -> some IntentResult {
+        guard let id = UUID(uuidString: plantId) else { return .result() }
+        ComplicationStore.waterPlant(id)
+        return .result()
+    }
+}
+
+struct MarkDeliveryReceivedIntent: AppIntent {
+    static let title: LocalizedStringResource = "watch_delivery_received"
+    static let isDiscoverable = false
+
+    @Parameter(title: "watch_deliveries")
+    var deliveryId: String
+
+    init() { deliveryId = "" }
+    init(deliveryId: String) { self.deliveryId = deliveryId }
+
+    func perform() async throws -> some IntentResult {
+        guard let id = UUID(uuidString: deliveryId) else { return .result() }
+        ComplicationStore.markDeliveryReceived(id)
+        return .result()
+    }
+}
+
+// MARK: - "Now at home" relevance configuration
+//
+// RelevanceEntriesProvider requires a WidgetConfigurationIntent: each moment
+// is one configuration, so the Smart Stack can promote the card for exactly
+// the moment whose clue matched. The person never edits it.
+
+enum NowMoment: String, AppEnum, CaseIterable {
+    case homecoming, watering, delivery, session
+
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "watch_comp_param_domain"
+
+    static let caseDisplayRepresentations: [NowMoment: DisplayRepresentation] = [
+        .homecoming: DisplayRepresentation(title: "watch_page_home"),
+        .watering:   DisplayRepresentation(title: "watch_water"),
+        .delivery:   DisplayRepresentation(title: "Out for delivery"),
+        .session:    DisplayRepresentation(title: "Work session"),
+    ]
+}
+
+struct PRVIONowIntent: WidgetConfigurationIntent {
+    static let title: LocalizedStringResource = "watch_now_title"
+    static let isDiscoverable = false
+
+    @Parameter(title: "watch_comp_param_domain", default: .homecoming)
+    var moment: NowMoment
+
+    static func showing(_ moment: NowMoment) -> PRVIONowIntent {
+        let intent = PRVIONowIntent()
+        intent.moment = moment
+        return intent
+    }
+}
+
 // MARK: - Controls (Control Center, Smart Stack, Action button)
 //
 // The Siri intents live in the app target, which this extension cannot see;

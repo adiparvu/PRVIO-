@@ -1,5 +1,6 @@
 import Foundation
 import RelevanceKit
+import WidgetKit
 
 // MARK: - Smart Stack relevance
 //
@@ -94,6 +95,58 @@ enum ComplicationRelevance {
         let span: TimeInterval = session.isPaused ? 3600 : 4 * 3600
         return [.date(interval: DateInterval(start: now, duration: span),
                       kind: session.isPaused ? .default : .scheduled)]
+    }
+}
+
+// MARK: - "Now at home" clues
+//
+// The card earns its place only in four moments, returned in priority order
+// (the system may keep just the first few):
+//   1. a work session is running (paused: a gentle reminder for an hour),
+//   2. a parcel is out for delivery (until 21:00 today),
+//   3. the morning watering window (07–10, today and tomorrow) while a plant
+//      is thirsty — skipped when rain is forecast, since watering can wait,
+//   4. the evening return home (17–20) while something is due now.
+// Nothing matches → no clue at all, and the card stays away.
+//
+// Arrival at home is approximated by the evening window. A real
+// `.location(inferred: .home)` clue needs When-in-Use location permission
+// granted to the watch app (and extended to this extension); the app does
+// not request it, so a location clue would never match. Add it ahead of the
+// evening window once the app asks for that permission.
+
+enum NowRelevance {
+    static func attributes(payload: WatchPayload?,
+                           session: WatchWorkSession?,
+                           now: Date = .now,
+                           calendar: Calendar = .current) -> [WidgetRelevanceAttribute<PRVIONowIntent>] {
+        let day = DayWindows(now: now, calendar: calendar)
+        var result: [WidgetRelevanceAttribute<PRVIONowIntent>] = []
+
+        func add(_ moment: NowMoment, _ contexts: [RelevantContext]) {
+            let configuration = PRVIONowIntent.showing(moment)
+            result += contexts.map { WidgetRelevanceAttribute(configuration: configuration, context: $0) }
+        }
+
+        add(.session, ComplicationRelevance.sessionContexts(session, now: now))
+
+        guard let payload else { return result }
+
+        if payload.showsDeliveries, !payload.outForDelivery.isEmpty,
+           let rest = day.window(dayOffset: 0, fromHour: 0, toHour: 21) {
+            add(.delivery, [.date(interval: rest, kind: .scheduled)])
+        }
+
+        if payload.showsPlants, payload.firstThirstyPlant != nil, payload.weatherAdvisory != "rain" {
+            add(.watering, day.windows(fromHour: 7, toHour: 10, days: 0...1)
+                .map { RelevantContext.date(interval: $0, kind: .scheduled) })
+        }
+
+        if ComplicationHousehold.attentionCount(payload) > 0 {
+            add(.homecoming, day.windows(fromHour: 17, toHour: 20, days: 0...1)
+                .map { RelevantContext.date(interval: $0, kind: .default) })
+        }
+        return result
     }
 }
 

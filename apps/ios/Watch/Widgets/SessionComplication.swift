@@ -14,6 +14,8 @@ import WidgetKit
 struct SessionEntry: TimelineEntry {
     let date: Date
     let session: WatchWorkSession?
+    /// Only for the card's sky; the face itself reads the session alone.
+    var payload: WatchPayload? = nil
 }
 
 struct SessionTimelineProvider: TimelineProvider {
@@ -24,14 +26,15 @@ struct SessionTimelineProvider: TimelineProvider {
     func getSnapshot(in context: Context, completion: @escaping (SessionEntry) -> Void) {
         let now = Date.now
         let session = ComplicationStore.session() ?? (context.isPreview ? WatchWorkSession.complicationSample(at: now) : nil)
-        completion(SessionEntry(date: now, session: session))
+        completion(SessionEntry(date: now, session: session, payload: ComplicationStore.payload()))
     }
 
     /// One entry: the running clock is system-driven timer text, so it ticks
     /// without new entries; the heartbeat only re-reads a missed transition.
     func getTimeline(in context: Context, completion: @escaping (Timeline<SessionEntry>) -> Void) {
         let now = Date.now
-        let entry = SessionEntry(date: now, session: ComplicationStore.session())
+        let entry = SessionEntry(date: now, session: ComplicationStore.session(),
+                                 payload: ComplicationStore.payload())
         completion(Timeline(entries: [entry],
                             policy: .after(now.addingTimeInterval(ComplicationTheme.refreshInterval))))
     }
@@ -46,9 +49,10 @@ struct PRVIOSessionComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: ComplicationKind.session, provider: SessionTimelineProvider()) { entry in
             SessionFace(session: entry.session, date: entry.date)
-                .complicationBackground(.calm(entry.session?.isPaused == true
-                                              ? ComplicationTheme.Tint.paused
-                                              : ComplicationTheme.Tint.session))
+                .complicationGround(.ground(entry.payload,
+                                            accent: entry.session?.isPaused == true
+                                                ? ComplicationTheme.Tint.paused
+                                                : ComplicationTheme.Tint.session))
         }
         .configurationDisplayName(Text("Work session"))
         .description(Text("watch_comp_session_desc"))
@@ -146,6 +150,7 @@ struct SessionFace: View {
                         Text(verbatim: session.title)
                     }
                 }
+                .accessibilityLabel(session.isPaused ? Text("watch_session_paused") : Text(verbatim: session.title))
         } else {
             Image(systemName: "timer")
                 .font(Theme.Typography.cornerValue)

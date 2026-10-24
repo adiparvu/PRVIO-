@@ -80,6 +80,38 @@ enum ComplicationStore {
         return watered.count
     }
 
+    /// Waters one plant (the Now card's drop button). Queued even when the
+    /// cached row already reads watered, for the same reason as `completeTask`.
+    static func waterPlant(_ id: UUID) {
+        edit { payload in
+            guard let index = payload.plants.firstIndex(where: { $0.id == id && $0.needsWatering }) else {
+                return false
+            }
+            let name = payload.plants[index].name
+            payload.plants[index].needsWatering = false
+            payload.snapshot.plantsNeedingWater = payload.plants.filter(\.needsWatering).count
+            payload.snapshot.plantNames.removeAll { $0 == name }
+            return true
+        }
+        WatchActionRelay.append(action: "waterPlant", id: id.uuidString)
+        reloadFaces()
+    }
+
+    /// Marks a parcel received (the Now card's delivery button), with the
+    /// app's optimistic edit: status `delivered`, active count recomputed.
+    static func markDeliveryReceived(_ id: UUID) {
+        edit { payload in
+            guard let index = payload.deliveries.firstIndex(where: { $0.id == id && $0.status != "delivered" }) else {
+                return false
+            }
+            payload.deliveries[index].status = "delivered"
+            payload.snapshot.activeDeliveryCount = payload.activeDeliveries.count
+            return true
+        }
+        WatchActionRelay.append(action: "deliveryReceived", id: id.uuidString)
+        reloadFaces()
+    }
+
     // MARK: Private
 
     /// Decodes the raw cache (not the sanitized copy, so nothing the app
@@ -110,8 +142,12 @@ enum ComplicationStore {
         }
     }
 
+    /// Repaints every face, and asks the Smart Stack to re-read the Now
+    /// card's relevance: an action taken on it usually ends its moment
+    /// (the plant is watered, the parcel is in), so it should step aside.
     private static func reloadFaces() {
         WidgetCenter.shared.reloadAllTimelines()
+        WidgetCenter.shared.invalidateRelevance(ofKind: ComplicationKind.now)
     }
 }
 
@@ -142,6 +178,22 @@ extension WatchPayload {
     }
 
     var hasOverdueTasks: Bool { snapshot.overdueTaskCount > 0 }
+
+    /// The first thirsty plant from the catalog (nil for catalog-less payloads).
+    var firstThirstyPlant: PlantCatalogEntry? { plants.first(where: \.needsWatering) }
+
+    /// Parcels at the door today — the only delivery state worth Next Up.
+    var outForDelivery: [DeliveryCatalogEntry] {
+        deliveries.filter { $0.status == "out_for_delivery" }
+    }
+
+    // Visibility mirror of WatchRoute.visiblePages / visibleModules: Next Up
+    // never offers an action on a surface the owner hid on the watch.
+    private static let defaultPageOrder = ["tasks", "plants", "shopping", "pantry", "deliveries", "map"]
+    private var pageKeys: [String] { pageOrder ?? Self.defaultPageOrder }
+    var showsTasks: Bool { pageKeys.contains("tasks") }
+    var showsPlants: Bool { pageKeys.contains("plants") && !plants.isEmpty }
+    var showsDeliveries: Bool { pageKeys.contains("deliveries") && !deliveries.isEmpty }
 
     var isOverBudget: Bool {
         guard let budgetSpent, let budgetLimit, budgetLimit > 0 else { return false }

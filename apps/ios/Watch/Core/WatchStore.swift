@@ -541,6 +541,9 @@ final class WatchStore {
     private func reloadComplications() {
         guard connector != nil else { return }
         WidgetCenter.shared.reloadAllTimelines()
+        // The Smart Stack "Now at home" card decides WHEN to appear from
+        // relevance clues, which reloadAllTimelines doesn't refresh.
+        WidgetCenter.shared.invalidateRelevance(ofKind: "PRVIOWatchNow")
         // Siri's "Complete <task>" / "Water <plant>" phrases resolve against
         // the entity list the system cached; refresh it with the same data.
         PRVIOWatchShortcuts.updateAppShortcutParameters()

@@ -19,29 +19,22 @@ struct DomainFace: View {
         case .health:     HealthFace(payload: payload)
         case .weather:    WeatherFace(payload: payload)
         case .budget:     BudgetFace(payload: payload)
-        case .tasks:      MetricFace(metric: .tasks(payload))
-        case .water:      MetricFace(metric: .water(payload))
-        case .shopping:   MetricFace(metric: .shopping(payload))
-        case .deliveries: MetricFace(metric: .deliveries(payload))
+        case .tasks:      MetricFace(metric: .tasks(payload), payload: payload)
+        case .water:      MetricFace(metric: .water(payload), payload: payload)
+        case .shopping:   MetricFace(metric: .shopping(payload), payload: payload)
+        case .deliveries: MetricFace(metric: .deliveries(payload), payload: payload)
         }
     }
 }
 
-extension ComplicationTone {
-    /// The Smart Stack wash a domain wears.
-    static func of(_ domain: WatchDomainOption, _ payload: WatchPayload?) -> ComplicationTone {
-        switch domain {
-        case .status, .tasks:
-            return payload?.hasOverdueTasks == true ? .attention : .calm(domain.tint)
-        case .weather:
-            return payload?.weatherAdvisory != nil ? .attention : .calm(domain.tint)
-        case .budget:
-            // Never `.attention`: the amount is redacted while the wrist is
-            // down, and a warning wash would still reveal "over budget".
-            return .calm(domain.tint)
-        case .water, .shopping, .deliveries, .health:
-            return .calm(domain.tint)
-        }
+extension ComplicationSky {
+    /// The ground a domain's rectangular card wears: the house's sky, warmed
+    /// by the household's state, leaned toward the domain's tint. Status
+    /// wears the pure sky — it IS the household. The warmth comes only from
+    /// the household (tasks, plants, sensors), never from spending, so the
+    /// budget card cannot reveal "over budget" while its amount is redacted.
+    static func of(_ domain: WatchDomainOption, _ payload: WatchPayload?) -> ComplicationSky {
+        ground(payload, accent: domain == .status ? nil : domain.tint)
     }
 }
 
@@ -53,8 +46,14 @@ struct DomainMetric {
     let isUrgent: Bool
     /// Up to two real titles on the rectangular face — names, not just a number.
     let lines: [String]
-    /// Set on the tasks face: the open task its check button completes.
-    let completableTaskId: UUID?
+    /// The one-tap action the rectangular face offers on its first line.
+    let action: FaceAction?
+
+    /// Actions a face can run in place. Each reuses the frozen relay vocabulary.
+    enum FaceAction {
+        case completeTask(UUID)
+        case waterPlant(UUID)
+    }
 
     static func tasks(_ payload: WatchPayload?) -> DomainMetric {
         let open = payload?.openTasksByUrgency ?? []
@@ -62,7 +61,7 @@ struct DomainMetric {
                             count: payload?.snapshot.openTaskCount ?? 0,
                             isUrgent: payload?.hasOverdueTasks ?? false,
                             lines: open.prefix(2).map(\.title),
-                            completableTaskId: open.first?.id)
+                            action: open.first.map { FaceAction.completeTask($0.id) })
     }
 
     static func water(_ payload: WatchPayload?) -> DomainMetric {
@@ -70,7 +69,7 @@ struct DomainMetric {
                      count: payload?.snapshot.plantsNeedingWater ?? 0,
                      isUrgent: false,
                      lines: Array((payload?.thirstyPlantNames ?? []).prefix(2)),
-                     completableTaskId: nil)
+                     action: payload?.firstThirstyPlant.map { FaceAction.waterPlant($0.id) })
     }
 
     static func shopping(_ payload: WatchPayload?) -> DomainMetric {
@@ -78,7 +77,7 @@ struct DomainMetric {
                      count: payload?.snapshot.pendingSupplyCount ?? 0,
                      isUrgent: false,
                      lines: Array((payload?.pendingSupplyNames ?? []).prefix(2)),
-                     completableTaskId: nil)
+                     action: nil)
     }
 
     static func deliveries(_ payload: WatchPayload?) -> DomainMetric {
@@ -87,12 +86,14 @@ struct DomainMetric {
                             count: payload?.snapshot.activeDeliveryCount ?? 0,
                             isUrgent: false,
                             lines: [next?.title, next?.eta].compactMap { $0 },
-                            completableTaskId: nil)
+                            action: nil)
     }
 }
 
 struct MetricFace: View {
     let metric: DomainMetric
+    /// For the household summary when the payload carries no catalog lines.
+    let payload: WatchPayload?
 
     @Environment(\.widgetFamily) private var family
     @Environment(\.widgetRenderingMode) private var renderingMode
@@ -172,8 +173,21 @@ struct MetricFace: View {
             HStack(alignment: .center, spacing: Theme.Spacing.s) {
                 VStack(alignment: .leading, spacing: 0) {
                     if metric.count == 0 {
-                        Text("watch_all_good")
-                            .font(Theme.Typography.detail)
+                        // Encouraging empty state: a symbol and a word, never a bare 0.
+                        Label {
+                            Text("watch_all_good")
+                        } icon: {
+                            Image(systemName: "checkmark.circle.fill")
+                                .widgetAccentable()
+                        }
+                        .font(Theme.Typography.brief)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    } else if metric.lines.isEmpty {
+                        // Catalog-less payload: the household's summary
+                        // instead of an empty line.
+                        ComplicationHousehold.summary(payload)
+                            .font(Theme.Typography.brief)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     } else {
@@ -186,20 +200,39 @@ struct MetricFace: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .combine)
 
-                if let taskId = metric.completableTaskId, metric.count > 0 {
-                    Button(intent: CompleteTopTaskIntent(taskId: taskId.uuidString)) {
-                        Image(systemName: "checkmark.circle")
-                            .font(Theme.Typography.action)
-                            .symbolRenderingMode(.hierarchical)
-                            .widgetAccentable()
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("watch_complete"))
+                if metric.count > 0, let action = metric.action {
+                    actionButton(action)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func actionButton(_ action: DomainMetric.FaceAction) -> some View {
+        switch action {
+        case .completeTask(let id):
+            Button(intent: CompleteTopTaskIntent(taskId: id.uuidString)) {
+                actionGlyph("checkmark.circle")
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("watch_complete"))
+        case .waterPlant(let id):
+            Button(intent: WaterPlantIntent(plantId: id.uuidString)) {
+                actionGlyph("drop.circle")
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("watch_water_now"))
+        }
+    }
+
+    private func actionGlyph(_ symbol: String) -> some View {
+        Image(systemName: symbol)
+            .font(Theme.Typography.action)
+            .symbolRenderingMode(.hierarchical)
+            .widgetAccentable()
     }
 
     private var inline: some View {
@@ -262,32 +295,59 @@ struct StatusFace: View {
             .widgetAccentable()
             .widgetCurvesContent()
             .widgetLabel { Text("watch_tasks") }
+            .accessibilityLabel(Text("watch_tasks"))
+            .accessibilityValue(isUrgent ? Text("\(open) \(Text("watch_overdue"))") : Text(verbatim: "\(open)"))
     }
 
+    private var state: ComplicationHousehold { ComplicationHousehold(payload) }
+
+    /// The phone's brief, unless a real alarm is on: a sentence composed
+    /// earlier must never talk over a critical sensor.
+    private var brief: String? {
+        state == .alarm ? nil : ComplicationBrief.line(payload?.briefHeadline)
+    }
+
+    /// Header (state shape + property), the voice line (brief, else the
+    /// encouraging summary), then the three counts. Taller variants first:
+    /// the brief gives up its second line before the counts give way.
     private var rectangular: some View {
+        ViewThatFits(in: .vertical) {
+            rectangularLayout(voiceLines: 2)
+            rectangularLayout(voiceLines: 1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: propertyName) + Text(verbatim: ", ") + state.word)
+        .accessibilityValue(voice + Text(verbatim: ". ") + Text("watch_dial_ax \(open) \(water) \(parcels)"))
+    }
+
+    private func rectangularLayout(voiceLines: Int) -> some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             HStack(spacing: Theme.Spacing.s) {
-                Image(systemName: WatchDomainOption.status.systemImage)
+                Image(systemName: state == .calm ? WatchDomainOption.status.systemImage : state.systemImage)
                     .font(Theme.Typography.glyph)
+                    .foregroundStyle(renderingMode == .fullColor && state != .calm
+                                     ? AnyShapeStyle(state.tint) : AnyShapeStyle(.primary))
                     .widgetAccentable()
-                    .accessibilityHidden(true)
                 Text(verbatim: propertyName)
                     .font(Theme.Typography.header)
                     .lineLimit(1)
             }
+            voice
+                .font(Theme.Typography.brief)
+                .foregroundStyle(.secondary)
+                .lineLimit(voiceLines)
+                .truncationMode(.tail)
             HStack(spacing: Theme.Spacing.l) {
                 stat(.tasks, value: open, isUrgent: isUrgent)
                 stat(.water, value: water, isUrgent: false)
                 stat(.deliveries, value: parcels, isUrgent: false)
             }
-            if let critical = payload?.snapshot.criticalTaskTitle {
-                Text(verbatim: critical)
-                    .font(Theme.Typography.detail)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var voice: Text {
+        brief.map { Text(verbatim: $0) } ?? ComplicationHousehold.summary(payload)
     }
 
     /// One line on the face: what needs doing, with glyphs instead of words.
@@ -302,7 +362,7 @@ struct StatusFace: View {
             Image(systemName: isUrgent ? UrgencyCue.symbol : domain.systemImage)
                 .font(Theme.Typography.glyph)
                 .foregroundStyle(isUrgent && renderingMode == .fullColor
-                                 ? AnyShapeStyle(Theme.Tint.critical) : AnyShapeStyle(.secondary))
+                                 ? AnyShapeStyle(Theme.Tint.attention) : AnyShapeStyle(.secondary))
                 .widgetAccentable(isUrgent)
                 .accessibilityLabel(domain.label)
             Text(verbatim: "\(value)")
@@ -350,6 +410,8 @@ struct HealthFace: View {
                 .widgetAccentable()
                 .widgetCurvesContent()
                 .widgetLabel { Text("watch_health") }
+                .accessibilityLabel(Text("watch_health"))
+                .accessibilityValue(Text(verbatim: scoreText))
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 HStack(spacing: Theme.Spacing.s) {
@@ -433,12 +495,17 @@ struct WeatherFace: View {
                     .font(Theme.Typography.circularValue)
                     .widgetAccentable()
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(advisory?.text ?? Text("watch_weather"))
+            .accessibilityValue(Text(verbatim: temperature))
         case .accessoryCorner:
             Text(verbatim: advisory == nil ? temperature : "\(temperature)!")
                 .font(Theme.Typography.cornerValue)
                 .widgetAccentable()
                 .widgetCurvesContent()
                 .widgetLabel { Text(verbatim: propertyName) }
+                .accessibilityLabel(advisory?.text ?? Text("watch_weather"))
+                .accessibilityValue(Text(verbatim: temperature))
         case .accessoryRectangular:
             rectangular
         default:
@@ -611,7 +678,7 @@ struct BudgetFace: View {
             if let spent, let limit {
                 Gauge(value: min(spent, limit), in: 0...limit) { EmptyView() }
                     .gaugeStyle(.accessoryLinearCapacity)
-                    .tint(isOver ? Theme.Tint.critical : Theme.Tint.budget)
+                    .tint(isOver ? Theme.Tint.attention : Theme.Tint.budget)
                     .widgetAccentable()
                     .accessibilityHidden(true)
             } else if let name = payload?.snapshot.propertyName {
