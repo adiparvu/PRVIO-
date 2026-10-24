@@ -1,0 +1,2 @@
+/* Watch permission prompts — the watch reads these instead of the phone table. */
+"NSLocationWhenInUseUsageDescription" = "PRVIO folosește locația ta doar pentru a afișa cardul potrivit când ajungi acasă.";

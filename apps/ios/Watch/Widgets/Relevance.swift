@@ -106,14 +106,14 @@ enum ComplicationRelevance {
 //   2. a parcel is out for delivery (until 21:00 today),
 //   3. the morning watering window (07–10, today and tomorrow) while a plant
 //      is thirsty — skipped when rain is forecast, since watering can wait,
-//   4. the evening return home (17–20) while something is due now.
+//   4. the return home while something is due now: arriving at the
+//      person's inferred home first, the evening window (17–20) after it.
 // Nothing matches → no clue at all, and the card stays away.
 //
-// Arrival at home is approximated by the evening window. A real
-// `.location(inferred: .home)` clue needs When-in-Use location permission
-// granted to the watch app (and extended to this extension); the app does
-// not request it, so a location clue would never match. Add it ahead of the
-// evening window once the app asks for that permission.
+// The inferred-home clue matches only once the watch app holds When-in-Use
+// location authorization (WatchLocationPermission asks once, from the Home
+// page); without it the clue never matches and the evening window alone
+// carries the homecoming. The extension itself never reads a location.
 
 enum NowRelevance {
     static func attributes(payload: WatchPayload?,
@@ -143,8 +143,9 @@ enum NowRelevance {
         }
 
         if ComplicationHousehold.attentionCount(payload) > 0 {
-            add(.homecoming, day.windows(fromHour: 17, toHour: 20, days: 0...1)
-                .map { RelevantContext.date(interval: $0, kind: .default) })
+            add(.homecoming, [RelevantContext.location(inferred: .home)]
+                + day.windows(fromHour: 17, toHour: 20, days: 0...1)
+                    .map { RelevantContext.date(interval: $0, kind: .default) })
         }
         return result
     }

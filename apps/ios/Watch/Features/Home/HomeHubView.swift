@@ -38,6 +38,14 @@ struct HomeHubView: View {
         }
         .navigationTitle(Text(WatchPage.home.titleKey))
         .skyGround()
+        // The one moment location is asked for (once, ever): here, with a
+        // home on screen, so the purpose — the right card on arriving home —
+        // reads in context. Keyed on the payload so a home that syncs in
+        // while this page is open still gets the ask.
+        .task(id: store.payload != nil) {
+            guard store.payload != nil else { return }
+            WatchLocationPermission.shared.requestIfNeeded()
+        }
     }
 }
 

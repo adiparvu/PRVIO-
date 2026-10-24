@@ -24,6 +24,10 @@
 	<false/>
 	<key>WKApplication</key>
 	<true/>
+	<!-- Required before requestWhenInUseAuthorization(); the grant only lets
+	     the system match the "Now at home" card's inferred-home clue. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>PRVIO uses your location only to show the right card when you arrive home.</string>
 	<key>WKCompanionAppBundleIdentifier</key>
 	<string>com.prvio.app</string>
 	<!-- Advertising the Handoff activity without declaring its type throws

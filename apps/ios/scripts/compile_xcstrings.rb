@@ -67,8 +67,12 @@ end
   # InfoPlist.strings in the matching .lproj — without this, every
   # permission sheet showed English regardless of device language.
   # Languages without their own table fall back to the English one.
-  infoplist = File.join(project_dir, "Resources", "#{lang}.lproj", "InfoPlist.strings")
-  infoplist = File.join(project_dir, "Resources", "en.lproj", "InfoPlist.strings") unless File.exist?(infoplist)
+  # The watch asks for its own permissions for its own reasons — sharing
+  # the phone's table would show the iPhone's purpose (Chat, Inventory) on
+  # the wrist's location prompt.
+  table = ENV.fetch("PLATFORM_NAME", "").start_with?("watch") ? "InfoPlist.watch.strings" : "InfoPlist.strings"
+  infoplist = File.join(project_dir, "Resources", "#{lang}.lproj", table)
+  infoplist = File.join(project_dir, "Resources", "en.lproj", table) unless File.exist?(infoplist)
   if File.exist?(infoplist)
     FileUtils.cp(infoplist, File.join(lproj_dir, "InfoPlist.strings"))
     puts "InfoPlist.strings → #{lang}.lproj"

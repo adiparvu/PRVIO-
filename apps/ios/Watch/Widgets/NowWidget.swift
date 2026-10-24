@@ -7,8 +7,9 @@ import WidgetKit
 //
 // A RelevanceConfiguration widget (watchOS 26+): it is never pinned, it only
 // appears when one of NowRelevance's clues matches — a running work session,
-// a parcel out for delivery, the morning watering window, the evening return
-// home — and stays away otherwise. It shows the single Next Up item with its
+// a parcel out for delivery, the morning watering window, arriving home (by
+// inferred location, with the evening window as fallback) — and stays away
+// otherwise. It shows the single Next Up item with its
 // one-tap action, and the day's brief under it.
 //
 // `associatedKind` lets the card take the place of a pinned Status card
