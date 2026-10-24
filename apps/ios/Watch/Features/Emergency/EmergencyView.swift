@@ -4,21 +4,31 @@ import SwiftUI
 //
 // Alert the family, raise the phone's Emergency Live Activity, walk the
 // shutoff steps, call a contact. Everything comes from what the owner set up
-// on the phone; nothing is invented. The ground is a signal, never an
-// atmosphere, so it never adopts the mood or sky.
+// on the phone; nothing is invented. It all lives in the cached payload, so
+// the plan reads with no phone and no network; calls dial from the watch
+// itself, and the alert queues until the phone is back in reach (said
+// honestly when that is the case).
+//
+// The ground is a signal, never an atmosphere: it never adopts the sky.
+// Surfaces on it are neutral and strokes stronger, for contrast on red.
 //
 // "Alert the family" is the page's primary action (bottom toolbar) and
 // always asks first: a pocket-tap false alarm costs the family real
-// adrenaline.
+// adrenaline. The page is family scope only (enforced by routing; the store
+// intents guard again).
+//
+// Privacy: the property, the steps and the contacts are emergency details —
+// `.watchPrivate()` redacts them in Always On until the wrist is raised.
 
 struct EmergencyView: View {
     @Environment(WatchStore.self) private var store
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var isConfirmingAlert = false
-    /// When the alert was sent; drives the 5 s "sent" state.
-    @State private var alertSentAt: Date?
-
-    private static let sentConfirmation: Duration = .seconds(5)
+    /// When the alert was handed to the store; drives the 5 s "sent" state.
+    @State private var alertSentAt: Date? = nil
+    /// When emergency mode was asked of the phone; drives its 5 s state.
+    @State private var emergencyStartedAt: Date? = nil
 
     init() {}
 
@@ -26,28 +36,42 @@ struct EmergencyView: View {
     private var steps: [EmergencyStepEntry] { store.payload?.emergencySteps ?? [] }
     private var contacts: [EmergencyContactEntry] { store.payload?.emergencyContacts ?? [] }
 
+    private var isOutOfReach: Bool {
+        store.connectivity == .unreachable || store.connectivity == .inactive
+    }
+
+    private var animation: Animation {
+        WatchTheme.Motion.resolved(WatchTheme.Motion.snappy, reduceMotion: reduceMotion)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: WatchTheme.Spacing.l) {
-                if alertSentAt != nil {
-                    AlertSentBanner()
-                        .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                PlanCard(propertyName: propertyName,
+                         isFamilyScope: store.isFamilyScope,
+                         isStarted: emergencyStartedAt != nil,
+                         isOutOfReach: isOutOfReach) {
+                    guard emergencyStartedAt == nil else { return }
+                    store.startEmergency()   // plays .notification
+                    withAnimation(animation) { emergencyStartedAt = Date() }
                 }
 
-                if store.isFamilyScope {
-                    startEmergencyButton
+                if alertSentAt != nil {
+                    AlertSentCard(isQueued: isOutOfReach)
+                        .transition(WatchTheme.Motion.transition(reduceMotion: reduceMotion))
                 }
 
                 if !steps.isEmpty {
                     VStack(alignment: .leading, spacing: WatchTheme.Spacing.s) {
                         SectionHeader("watch_emergency_steps")
-                        WatchCard(tint: WatchTheme.Tint.warning) {
+                        WatchCard(tint: WatchTheme.Tint.neutral) {
                             VStack(alignment: .leading, spacing: WatchTheme.Spacing.m) {
                                 ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
                                     EmergencyStepRow(number: index + 1, step: step)
                                 }
                             }
                         }
+                        .watchPrivate()
                     }
                 }
 
@@ -60,97 +84,176 @@ struct EmergencyView: View {
                     }
                 }
             }
+            .padding(.horizontal, WatchTheme.Spacing.xxs)
         }
         .navigationTitle(Text(WatchModule.emergency.titleKey))
-        .watchSignalGround(WatchTheme.Tint.emergency)
+        .signalGround(WatchTheme.Tint.emergency)
         .toolbar {
             // The condition lives inside the item: ToolbarContentBuilder's
-            // documented `buildIf` only takes customizable (id'd) content.
+            // `buildIf` only takes customizable (id'd) content.
             ToolbarItem(placement: .bottomBar) {
                 if store.canAlertFamily {
                     alertFamilyButton
                 }
             }
         }
-        .confirmationDialog("emg_alert_confirm_title",
+        .confirmationDialog(Text("emg_alert_confirm_title"),
                             isPresented: $isConfirmingAlert,
                             titleVisibility: .visible) {
-            Button("emg_alert_confirm_send", role: .destructive) {
-                store.alertFamily()
-                withAnimation(WatchTheme.Motion.snappy) { alertSentAt = Date() }
+            Button(role: .destructive) {
+                store.alertFamily()   // plays .notification
+                withAnimation(animation) { alertSentAt = Date() }
+            } label: {
+                Text("emg_alert_confirm_send")
             }
         } message: {
             Text("emg_alert_confirm_msg \(propertyName)")
         }
         .task(id: alertSentAt) {
             guard alertSentAt != nil else { return }
-            do { try await Task.sleep(for: Self.sentConfirmation) } catch { return }
-            withAnimation(WatchTheme.Motion.smooth) { alertSentAt = nil }
+            do { try await Task.sleep(for: EmergencyTiming.confirmation) } catch { return }
+            withAnimation(animation) { alertSentAt = nil }
+        }
+        .task(id: emergencyStartedAt) {
+            guard emergencyStartedAt != nil else { return }
+            do { try await Task.sleep(for: EmergencyTiming.confirmation) } catch { return }
+            withAnimation(animation) { emergencyStartedAt = nil }
         }
     }
 
-    // MARK: Actions
+    // MARK: Primary action
 
     private var alertFamilyButton: some View {
-        Button {
+        let isSent = alertSentAt != nil
+        return Button {
             // While the "sent" state shows, a second alert is one tap too
             // easy; the state clears on its own after a few seconds.
-            guard alertSentAt == nil else { return }
+            guard !isSent else { return }
             isConfirmingAlert = true
         } label: {
-            Label(alertSentAt == nil ? LocalizedStringKey("emg_alert_family")
-                                     : LocalizedStringKey("emg_alert_sent"),
-                  systemImage: alertSentAt == nil ? "exclamationmark.bubble.fill" : "checkmark.seal.fill")
-                .contentTransition(.symbolEffect(.replace))
+            Label(isSent ? LocalizedStringKey("emg_alert_sent") : LocalizedStringKey("emg_alert_family"),
+                  systemImage: isSent ? "checkmark.seal.fill" : "exclamationmark.bubble.fill")
+                .contentTransition(reduceMotion ? ContentTransition.opacity
+                                                : ContentTransition.symbolEffect(.replace))
         }
-        .tint(alertSentAt == nil ? WatchTheme.Tint.emergency : WatchTheme.Tint.success)
-    }
-
-    private var startEmergencyButton: some View {
-        Button {
-            store.startEmergency()
-        } label: {
-            Label("watch_emergency_start", systemImage: "light.beacon.max.fill")
-                .font(WatchTheme.Typography.cardTitle)
-                .frame(maxWidth: .infinity, minHeight: WatchTheme.Size.actionMinHeight)
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(WatchTheme.Tint.emergency)
+        .tint(isSent ? WatchTheme.Tint.success : WatchTheme.Tint.emergency)
     }
 }
 
-// MARK: - Sent banner
+private enum EmergencyTiming {
+    /// How long a sent / started confirmation stays (the brief: 5 s).
+    static let confirmation: Duration = .seconds(5)
+}
 
-private struct AlertSentBanner: View {
+// MARK: - Plan card
+
+/// The page's head: the property, a plain promise that the plan works
+/// offline, and — in family scope — the one big Start button.
+private struct PlanCard: View {
+    let propertyName: String
+    let isFamilyScope: Bool
+    let isStarted: Bool
+    let isOutOfReach: Bool
+    let start: () -> Void
+
     var body: some View {
-        WatchCard(tint: WatchTheme.Tint.success) {
-            Label {
-                Text("emg_alert_sent")
-                    .font(WatchTheme.Typography.cardTitle)
-            } icon: {
-                Image(systemName: "checkmark.seal.fill")
-                    .foregroundStyle(WatchTheme.Tint.success)
-                    .accessibilityHidden(true)
+        WatchCard(tint: WatchTheme.Tint.neutral, radius: WatchTheme.Radius.hero) {
+            VStack(alignment: .leading, spacing: WatchTheme.Spacing.m) {
+                HStack(spacing: WatchTheme.Spacing.s) {
+                    Image(systemName: "light.beacon.max.fill")
+                        .font(WatchTheme.Typography.glyph)
+                        .foregroundStyle(WatchTheme.Tint.emergency)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: WatchTheme.Spacing.xxs) {
+                        if !propertyName.isEmpty {
+                            Text(verbatim: propertyName)
+                                .font(WatchTheme.Typography.cardTitle)
+                                .lineLimit(2)
+                                .watchPrivate()
+                        }
+                        StateLabel("watch_emergency_ready", systemImage: "checkmark.shield.fill",
+                                   tint: WatchTheme.Tint.success)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+
+                if isFamilyScope {
+                    Button(action: start) {
+                        Label(isStarted ? LocalizedStringKey("watch_emergency_started")
+                                        : LocalizedStringKey("watch_emergency_start"),
+                              systemImage: isStarted ? "checkmark.circle.fill" : "light.beacon.max.fill")
+                    }
+                    .buttonStyle(SignalButtonStyle(isSettled: isStarted))
+                    .accessibilityHint(Text("watch_emergency_start_hint"))
+
+                    if isStarted, isOutOfReach {
+                        QueuedNote()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Sent card
+
+/// The alert's answer for five seconds. Out of reach it is honest: the
+/// alert waits in the queue and leaves when the phone is back.
+private struct AlertSentCard: View {
+    let isQueued: Bool
+
+    var body: some View {
+        WatchCard(tint: isQueued ? WatchTheme.Tint.attention : WatchTheme.Tint.success) {
+            VStack(alignment: .leading, spacing: WatchTheme.Spacing.xs) {
+                HStack(alignment: .top, spacing: WatchTheme.Spacing.s) {
+                    Image(systemName: isQueued ? "clock.fill" : "checkmark.seal.fill")
+                        .foregroundStyle(isQueued ? WatchTheme.Tint.attention : WatchTheme.Tint.success)
+                        .accessibilityHidden(true)
+                    Text(isQueued ? LocalizedStringKey("emg_alert_sending") : LocalizedStringKey("emg_alert_sent"))
+                        .font(WatchTheme.Typography.cardTitle)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if isQueued {
+                    QueuedNote()
+                }
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isStaticText)
+    }
+}
+
+/// "Sends when your iPhone is back in reach."
+private struct QueuedNote: View {
+    var body: some View {
+        Text("watch_emergency_queued")
+            .font(WatchTheme.Typography.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 
 // MARK: - Step
 
+/// A numbered step. The number sits in an outlined disc in the primary
+/// colour — legible on red, and not dependent on colour at all.
 private struct EmergencyStepRow: View {
     let number: Int
     let step: EmergencyStepEntry
+
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: WatchTheme.Spacing.s) {
             Text(verbatim: "\(number)")
                 .font(WatchTheme.Typography.badge)
-                .foregroundStyle(WatchTheme.Tint.warning)
                 .monospacedDigit()
-            VStack(alignment: .leading, spacing: 1) {
+                .frame(width: WatchTheme.Size.rowIcon, height: WatchTheme.Size.rowIcon)
+                .overlay {
+                    Circle().strokeBorder(Color.primary, lineWidth: WatchTheme.Stroke.outline(contrast))
+                }
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: WatchTheme.Spacing.xxs) {
                 Text(verbatim: step.title)
                     .font(WatchTheme.Typography.rowTitle)
                 if !step.detail.isEmpty {
@@ -163,6 +266,8 @@ private struct EmergencyStepRow: View {
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("watch_emergency_step_ax \(number)"))
+        .accessibilityValue(Text(verbatim: step.detail.isEmpty ? step.title : "\(step.title). \(step.detail)"))
     }
 }
 
@@ -173,6 +278,8 @@ private struct EmergencyStepRow: View {
 /// than dialling garbage.
 private struct EmergencyContactRow: View {
     let contact: EmergencyContactEntry
+
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
 
     private var callURL: URL? {
         let dialable = contact.phone.filter { $0.isASCII && ($0.isNumber || $0 == "+") }
@@ -193,16 +300,23 @@ private struct EmergencyContactRow: View {
     }
 
     private func row(isCallable: Bool) -> some View {
-        WatchCard(tint: isCallable ? WatchTheme.Tint.success : WatchTheme.Tint.neutral) {
+        let tint = isCallable ? WatchTheme.Tint.success : WatchTheme.Tint.neutral
+        return WatchCard(tint: WatchTheme.Tint.neutral, radius: WatchTheme.Radius.row) {
             HStack(spacing: WatchTheme.Spacing.m) {
                 Image(systemName: "phone.fill")
                     .font(WatchTheme.Typography.glyph)
-                    .foregroundStyle(isCallable ? WatchTheme.Tint.success : Color.secondary)
-                    .frame(width: WatchTheme.Size.rowIcon, height: WatchTheme.Size.rowIcon)
-                    .background((isCallable ? WatchTheme.Tint.success : WatchTheme.Tint.neutral)
-                                    .opacity(WatchTheme.Opacity.glyphFill), in: Circle())
+                    .foregroundStyle(isCallable ? tint : Color.secondary)
+                    .frame(width: WatchTheme.Size.prominentGlyph, height: WatchTheme.Size.prominentGlyph)
+                    .background {
+                        if isLuminanceReduced {
+                            Circle().strokeBorder(tint.opacity(WatchTheme.AlwaysOn.strokeOpacity),
+                                                  lineWidth: WatchTheme.Stroke.hairline)
+                        } else {
+                            Circle().fill(tint.opacity(WatchTheme.Opacity.glyphFill))
+                        }
+                    }
                     .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: WatchTheme.Spacing.xxs) {
                     Text(verbatim: contact.name)
                         .font(WatchTheme.Typography.rowTitle)
                         .lineLimit(1)
@@ -212,12 +326,61 @@ private struct EmergencyContactRow: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
+                    if !contact.phone.isEmpty {
+                        Text(verbatim: contact.phone)
+                            .font(WatchTheme.Typography.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
                 }
                 Spacer(minLength: 0)
             }
         }
         .accessibilityElement(children: .combine)
         // Names and numbers of the household's people stay off a resting wrist.
-        .privacySensitive()
+        .watchPrivate()
+    }
+}
+
+// MARK: - Signal button
+
+/// The Start button: solid red with white words — the highest-contrast
+/// object on the page (content, never glass). Always On draws it as a red
+/// outline; once started it settles to the success colour.
+private struct SignalButtonStyle: ButtonStyle {
+    let isSettled: Bool
+
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    func makeBody(configuration: Configuration) -> some View {
+        let pressed = configuration.isPressed
+        let tint = isSettled ? WatchTheme.Tint.success : WatchTheme.Tint.emergency
+        let shape = RoundedRectangle(cornerRadius: WatchTheme.Radius.card, style: .continuous)
+        configuration.label
+            .font(WatchTheme.Typography.cardTitle)
+            .lineLimit(2)
+            .minimumScaleFactor(0.8)
+            .multilineTextAlignment(.center)
+            .foregroundStyle(isLuminanceReduced ? tint : Color.white)
+            .frame(maxWidth: .infinity, minHeight: WatchTheme.Size.actionMinHeight)
+            .padding(.horizontal, WatchTheme.Spacing.m)
+            .padding(.vertical, WatchTheme.Spacing.xs)
+            .background {
+                if isLuminanceReduced {
+                    shape.strokeBorder(tint.opacity(WatchTheme.AlwaysOn.strokeOpacity),
+                                       lineWidth: WatchTheme.Stroke.outline(contrast))
+                } else {
+                    shape.fill(tint)
+                }
+            }
+            .contentShape(shape)
+            .opacity(pressed && reduceMotion ? 0.7 : 1)
+            .scaleEffect(pressed && !reduceMotion ? 0.96 : 1)
+            .animation(WatchTheme.Motion.resolved(WatchTheme.Motion.snappy, reduceMotion: reduceMotion),
+                       value: pressed)
     }
 }

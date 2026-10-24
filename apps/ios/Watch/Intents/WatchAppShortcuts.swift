@@ -1,6 +1,5 @@
 import AppIntents
 import Foundation
-import WatchKit
 import WidgetKit
 
 // MARK: - Siri on the wrist
@@ -10,6 +9,10 @@ import WidgetKit
 // offline-capable) and queue the real action through WatchActionRelay, the
 // same guaranteed-delivery path the interactive complications use; the app
 // forwards the queue on its next activation and the phone reconciles.
+//
+// Haptics speak the app's vocabulary through WatchHaptic: a task completed
+// or a plant watered is `.done` (success), exactly as in the app — never a
+// direct device haptic, so a success always means something was done.
 //
 // Phrases: the watch target does not compile Resources/AppShortcuts.xcstrings,
 // so the Romanian phrases sit beside the English ones in each list.
@@ -35,12 +38,14 @@ private enum WatchIntentCache {
         return try? JSONDecoder().decode(WatchPayload.self, from: data)
     }
 
-    /// Persists the edit and repaints the faces.
+    /// Persists the edit, repaints the faces, and refreshes the entity lists
+    /// Siri resolves spoken names against.
     static func write(_ payload: WatchPayload) {
         if let data = try? JSONEncoder().encode(payload) {
             defaults.set(data, forKey: payloadKey)
         }
         WidgetCenter.shared.reloadAllTimelines()
+        PRVIOWatchShortcuts.updateAppShortcutParameters()
     }
 
     /// Open tasks, overdue first — the order the Tasks page shows.
@@ -103,6 +108,7 @@ struct WatchTaskEntity: AppEntity {
         isOverdue = entry.isOverdue == true
     }
 
+    /// Overdue is stated plainly, with its symbol — the same words the app uses.
     var displayRepresentation: DisplayRepresentation {
         let subtitle: LocalizedStringResource? = isOverdue ? "watch_overdue" : nil
         return DisplayRepresentation(
@@ -155,7 +161,11 @@ struct WatchPlantEntity: AppEntity {
 
     var displayRepresentation: DisplayRepresentation {
         let subtitle: LocalizedStringResource? = needsWatering ? "Needs water" : nil
-        return DisplayRepresentation(title: "\(emoji) \(name)", subtitle: subtitle)
+        let title = emoji.isEmpty ? name : "\(emoji) \(name)"
+        return DisplayRepresentation(
+            title: "\(title)",
+            subtitle: subtitle,
+            image: needsWatering ? DisplayRepresentation.Image(systemName: "drop.fill") : nil)
     }
 }
 
@@ -200,7 +210,7 @@ struct CompleteNextTaskSiriIntent: AppIntent {
         }
         WatchIntentCache.write(payload)
         WatchActionRelay.append(action: "completeTask", id: next.id.uuidString)
-        WKInterfaceDevice.current().play(.success)
+        WatchHaptic.done.play()
         return .result(dialog: IntentDialog("watch_siri_completed \(title)"))
     }
 }
@@ -221,11 +231,12 @@ struct WaterAllPlantsSiriIntent: AppIntent {
         }
         WatchIntentCache.water(Set(thirsty), in: &payload)
         WatchIntentCache.write(payload)
-        // The phone's queue is per plant: one relay entry each.
+        // The phone's queue is per plant: one relay entry each; one haptic
+        // for the request, as the app's "Water all" plays.
         for id in thirsty {
             WatchActionRelay.append(action: "waterPlant", id: id.uuidString)
         }
-        WKInterfaceDevice.current().play(.directionUp)
+        WatchHaptic.done.play()
         return .result(dialog: IntentDialog("watch_siri_watered \(thirsty.count)"))
     }
 }
@@ -252,7 +263,7 @@ struct CompleteWatchTaskIntent: AppIntent {
         }
         WatchIntentCache.write(payload)
         WatchActionRelay.append(action: "completeTask", id: task.id.uuidString)
-        WKInterfaceDevice.current().play(.success)
+        WatchHaptic.done.play()
         return .result(dialog: IntentDialog("watch_siri_completed \(title)"))
     }
 }
@@ -280,7 +291,7 @@ struct WaterWatchPlantIntent: AppIntent {
         WatchIntentCache.water([entry.id], in: &payload)
         WatchIntentCache.write(payload)
         WatchActionRelay.append(action: "waterPlant", id: entry.id.uuidString)
-        WKInterfaceDevice.current().play(.directionUp)
+        WatchHaptic.done.play()
         return .result(dialog: IntentDialog("watch_siri_watered_plant \(entry.name)"))
     }
 }
@@ -290,7 +301,7 @@ struct WaterWatchPlantIntent: AppIntent {
 // Phrases with an entity parameter are filled from the queries'
 // `suggestedEntities()`; the system re-reads them when
 // `PRVIOWatchShortcuts.updateAppShortcutParameters()` is called after the
-// task or plant list changes.
+// task or plant list changes (WatchStore and the intents above both do).
 
 struct PRVIOWatchShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
