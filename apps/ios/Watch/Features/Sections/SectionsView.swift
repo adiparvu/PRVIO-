@@ -75,6 +75,7 @@ struct SectionsView: View {
 
 /// One line of live state for a section row — words first, with a symbol when
 /// the line is a call to act (never colour alone).
+@MainActor
 private struct SectionStatus {
     let text: Text
     /// A leading symbol for states that ask for the person (or confirm calm).
